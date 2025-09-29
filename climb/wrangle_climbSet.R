@@ -24,10 +24,10 @@ invisible(lapply(required_packages, library, character.only = TRUE))
 #----------------------------------------------------------
 
 # Get all CSV files starting with "set" in the current directory
-files <- list.files(path = ".", pattern = "^set.*\\.csv$", full.names = TRUE)
+files <- list.files(path = "climb/data/", pattern = "^set.*\\.csv$", full.names = TRUE)
 
 # Stock genotype reference file
-stock_geno <- read.csv("../stock_genotype.csv") %>% 
+stock_geno <- read.csv("stock_genotype.csv") %>% 
   select(-MitoNuc) %>% 
   mutate(Build = case_when(
     grepl("A", Stock) ~ "A",
@@ -47,9 +47,10 @@ clean_climb_data <- function(df) {
       Nuc = substr(Nuc, 1, nchar(Nuc) - 1),
       build = substr(Nuc, nchar(Nuc), nchar(Nuc)),
       Nuc = substr(Nuc, 1, nchar(Nuc) - 1),
-      vial = as.integer(sapply(strsplit(vial_ID, "_"), tail, 1))
+      vial = sapply(strsplit(vial_ID, "_"), tail, 1)
     ) %>%
-    filter(vial != "all")
+    filter(vial != "all") %>% 
+    mutate(vial = as.integer(vial))
   return(df)
 }
 
@@ -62,7 +63,7 @@ dfs <- lapply(files, read.csv)
 
 # Apply column cleaning where needed
 dfs <- lapply(seq_along(dfs), function(i) {
-  if (all(c("Nuc", "vial_ID") %in% colnames(dfs[[i]]))) {
+  if (!all(c("build") %in% colnames(dfs[[i]]))) {
     clean_climb_data(dfs[[i]])
   } else {
     dfs[[i]]
@@ -123,4 +124,4 @@ climb_df <- climb_df %>%
 # 6. Save processed data
 #----------------------------------------------------------
 
-write.csv(climb_df, "climb.csv", row.names = FALSE, quote = FALSE)
+write.csv(climb_df, "climb/data/climb.csv", row.names = FALSE, quote = FALSE)

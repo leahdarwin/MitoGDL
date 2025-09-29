@@ -25,7 +25,7 @@ invisible(lapply(required_packages, library, character.only = TRUE))
 # 1. Load data
 #----------------------------------------------------------
 
-climb <- read.csv("climb.csv", header = TRUE)
+climb <- read.csv("climb/data/climb.csv", header = TRUE)
 
 #----------------------------------------------------------
 # 2. Compute correction terms
@@ -57,5 +57,5 @@ climb_adj <- climb %>%
 # 4. Save adjusted dataset
 #----------------------------------------------------------
 
-write.csv(climb_adj, "climb_adj.csv", row.names = FALSE, quote = FALSE)
+write.csv(climb_adj, "climb/data/climb_adj.csv", row.names = FALSE, quote = FALSE)
 
