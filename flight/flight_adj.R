@@ -71,5 +71,5 @@ plot_flight = flight_adj %>%
 # -------------------------------------------
 # Save outputs
 # -------------------------------------------
-write.csv(flight_adj, "flight/dataflight_adj.csv", row.names = FALSE, quote = FALSE)
+write.csv(flight_adj, "flight/data/flight_adj.csv", row.names = FALSE, quote = FALSE)
 
