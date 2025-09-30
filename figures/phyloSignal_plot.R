@@ -1,5 +1,5 @@
 ############################################################
-# Script: phylosignal.R
+# Script: phyloSignal_plot.R
 # Author: Leah Darwin
 # Date: 2025-09-30
 # Purpose: Test for phylogenetic signal (Blomberg’s K) in

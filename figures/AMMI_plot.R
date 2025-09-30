@@ -1,5 +1,5 @@
 ############################################################
-# Script: AMMI.R
+# Script: AMMI_plot.R
 # Author: Leah Darwin
 # Date: 2025-09-30
 # Purpose: Perform AMMI analysis on adjusted climbing data 
