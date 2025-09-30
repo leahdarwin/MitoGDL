@@ -103,5 +103,5 @@ p = autoplot(pca, data = merged, color = "Nuc", x = 1, y = 2) +
   theme(legend.position = "top")
 
 # Save to PDF
-ggsave("figures/pca_figS2.pdf", p, width = 8, height = 5)
+ggsave("figures/pca_figS2.pdf", p, width = 4, height = 3)
 
