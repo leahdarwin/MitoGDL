@@ -89,8 +89,8 @@ dev <- read.csv("development/data/development_adj.csv") %>%
 weight <- read.csv("weight/data/weight_adj.csv") %>%
   group_by(Mito, Nuc, Treatment, Sex) %>%
   na.omit() %>%
-  summarise(Y = mean(Y_adj),
-            se_value = sd(Y_adj) / sqrt(n()),) %>%
+  summarise(Y = mean(Y_adj*1000),
+            se_value = sd(Y_adj*1000) / sqrt(n()),) %>%
   mutate(Mito = case_when(
     Mito == "Bei05" ~ "Bei5",
     .default = Mito
@@ -157,11 +157,7 @@ custom_theme <- theme(
 # Save base plot to object for re-use
 g <- ggtree(mttree) +
   geom_tiplab(align = TRUE) +
-  hexpand(0.3) +
-  custom_theme
-
-# Add node labels to the tree
-g + geom_text2(aes(label = node), hjust = -0.3, size = 3)
+  hexpand(0.3) 
 
 #-----------------------------------------------------------
 # Create plots for each phenotype
