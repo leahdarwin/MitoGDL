@@ -168,11 +168,11 @@ run_corr_tests <- function(combs, merged_df, out_fig) {
 # -------------------------------------------------------------------
 run_corr_tests(
   combs_F, merged_F,
-  out_fig = "figures/female_pheno_corr_S1a.pdf"
+  out_fig = "figures/female_pheno_corr_figS1a.pdf"
 )
 
 run_corr_tests(
   combs_M, merged_M,
-  out_fig = "figures/male_pheno_corr_S1b.pdf"
+  out_fig = "figures/male_pheno_corr_figS1b.pdf"
 )
 
