@@ -107,7 +107,8 @@ kable(climbF_aov_tab, format = "latex", booktabs = TRUE,
 ## Male-only model
 ## ---------------------------
 climbM_lm <- lmer(
-  Y_adj ~ Mito * Nuc * Treatment + (1 | Mito:Nuc:Build),
+  Y_adj ~ Mito * Nuc * Treatment + (1 | Mito:Nuc:Build) + 
+    (1 | Mito:Nuc:Build:Treatment:Vial),
   data = climbM
 )
 

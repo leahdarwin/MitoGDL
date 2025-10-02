@@ -146,7 +146,7 @@ get_corr_df = function(df){
 }
 
 # Define sex color palette
-sex_colors <- c("F" = "lightgrey", "M" = "gray34")
+sex_colors <- c("F" = "lightgrey", "M" = "gray14")
 
 # Load datasets -----------------------------------------------------------
 
@@ -205,7 +205,7 @@ combined_plot <- pbootclimb + theme(legend.position = "none") +
   pbootflight + labs(y = "")
 
 # Save to PDF
-ggsave("figures/mothers_curse_fig3.pdf", combined_plot, width = 15, height = 5)
+ggsave("figures/mothers_curse_fig3.pdf", combined_plot, width = 15, height = 6)
 
 # Correlation results
 corrdf <- rbind(get_corr_df(weight) %>% mutate(Trait="weight"),
