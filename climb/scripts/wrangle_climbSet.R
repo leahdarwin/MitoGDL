@@ -90,7 +90,6 @@ dfs <- lapply(seq_along(dfs), function(i) {
 dfs <- lapply(dfs, function(x) x %>%
                 mutate(
                   Mito = str_replace(Mito, "Yak", "yak"),
-                  Mito = str_replace(Mito, "Sm21", "sm21"),
                   Mito = str_replace(Mito, "Zw", "ZW")
                 )
 )
