@@ -135,5 +135,5 @@ pM <- make_plot(climbM, "Male Climb")
 combined_plot <- pF + pM
 
 # Save to PDF
-ggsave("figures/climb_ammi_fig2.pdf", combined_plot, width = 10, height = 5)
+ggsave("figures/main_figs/AMMI_fig4.pdf", combined_plot, width = 10, height = 5)
 

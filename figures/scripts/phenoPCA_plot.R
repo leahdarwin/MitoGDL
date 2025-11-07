@@ -1,5 +1,5 @@
 ############################################################
-# Script: phenotype_pca.R
+# Script: phenoPCA_plot.R
 # Author: Leah Darwin
 # Date: 2025-09-30
 # Purpose: Summarize fly phenotype data (weight, climb,
@@ -103,5 +103,5 @@ p = autoplot(pca, data = merged, color = "Nuc", x = 1, y = 2) +
   theme(legend.position = "top")
 
 # Save to PDF
-ggsave("figures/pca_figS2.pdf", p, width = 4, height = 3)
+ggsave("figures/supp_figs/phenoPCA_figS3.pdf", p, width = 4, height = 3)
 

@@ -129,5 +129,5 @@ p3 <- get_corr(merged_dev,    "Development")
 combined_plot <- p3 + p1 + theme(legend.position = "none") + p2
 
 # Save to PDF
-ggsave("figures/set9_corr_figS3.pdf", combined_plot, width = 11, height = 4)
+ggsave("figures/set9Corr_figS4.pdf", combined_plot, width = 11, height = 4)
 

@@ -22,7 +22,7 @@ lapply(packages, library, character.only = TRUE)
 #-----------------------------------------------------------
 # Load phylogeny 
 #-----------------------------------------------------------
-mttree <- read.tree("figures/GDL_mts_SR_all.raxml.bestTree")
+mttree <- read.tree("figures/extra_data/GDL_mts_SR_all.raxml.bestTree")
 
 #-----------------------------------------------------------
 # Define function: calculate Blomberg’s K for a given condition
@@ -252,4 +252,4 @@ combined_plot <- p1 %>%
   insert_right(p4)
 
 # Save to PDF
-ggsave("figures/tree_pheno_fig4.pdf", combined_plot, width = 14, height = 5)
+ggsave("figures/phyloSignal_EDfig2.pdf", combined_plot, width = 14, height = 5)

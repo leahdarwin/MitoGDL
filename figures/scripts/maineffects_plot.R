@@ -1,5 +1,5 @@
 ###########################################################
-# Script: maineffects_plot.R
+# Script: mainEffects_plot.R
 # Author: Leah Darwin
 # Date: 2025-09-30
 # Purpose: Plots emmeans and adjusted averages for significant main effects. 
@@ -319,5 +319,5 @@ mito = weightF_plot_mt / weightM_plot_mt / climbF_plot_mt
 final = nuc_treat / mito +
   plot_layout(heights = c(0.6,1))
 
-ggsave("figures/main_effects_plot.pdf", final, width = 6.5, height = 7.5)
+ggsave("figures/main_figs/mainEffects_fig2.pdf", final, width = 6.5, height = 7.5)
 

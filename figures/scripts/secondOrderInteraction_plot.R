@@ -1,5 +1,5 @@
 ###########################################################
-# Script: ixn_plots.R
+# Script: secondOrderInteraction_plot.R
 # Author: Leah Darwin
 # Date: 2025-09-30
 # Purpose: Plots interaction plots for significant second order effects using estimated marginal means. 
@@ -193,7 +193,7 @@ climbF_ixn_plot = plot_ixn_mttreat(climbF_dfs$emmeans) +
 ## Combine and save plots
 ## -------------------------------------------------------------------
 combined_plot = weight_ixn_plot | dev_ixn_plot | climbF_ixn_plot | climbM_ixn_plot
-ggsave("figures/ixn_plot.pdf", combined_plot, width = 11, height = 4.5)
+ggsave("figures/main_figs/secondOrderInteraction_fig3.pdf", combined_plot, width = 11, height = 4.5)
 
 
 

@@ -205,7 +205,7 @@ combined_plot <- pbootclimb + theme(legend.position = "none") +
   pbootflight + labs(y = "")
 
 # Save to PDF
-ggsave("figures/mothers_curse_fig3.pdf", combined_plot, width = 15, height = 6)
+ggsave("figures/ed_figs/mothersCurse_EDfig1.pdf", combined_plot, width = 15, height = 6)
 
 # Correlation results
 corrdf <- rbind(get_corr_df(weight) %>% mutate(Trait="weight"),

@@ -98,4 +98,4 @@ plots = lapply(traits, function(x) make_plot(x[[1]], x[[2]]))
 final = wrap_plots(plots)
 
 # Save to PDF
-ggsave("figures/build_corr_figS.pdf", final, width = 7, height = 6)
+ggsave("figures/supp_figs/buildCorr_figS1.pdf", final, width = 7, height = 6)
