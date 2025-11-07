@@ -1,6 +1,6 @@
 # MitoGDL Project Overview
 
-This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript. The project is organized by trait, with each trait-specific folder containing raw data and scripts for processing. A separate `figures` folder contains the code required to reproduce all figures presented in the manuscript.  
+This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". The project is organized by trait, with each trait-specific folder containing raw data and scripts for processing. A separate `figures` folder contains the code required to reproduce all figures presented in the manuscript.  
 
 ---
 
