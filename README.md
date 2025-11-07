@@ -1,5 +1,4 @@
-# MitoGDL Project Overview
-
+# MitoGDL 
 This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". The project is organized by trait, with each trait-specific folder containing raw data and scripts for processing. A separate `figures` folder contains the code required to reproduce all figures presented in the manuscript.  
 
 ---
@@ -16,7 +15,11 @@ This repository contains all data and scripts used for the analyses and figures 
 │   └── ...
 │
 ├── figures/
-│   ├── scripts/ # Scripts to reproduce all manuscript figures
+│   ├── scripts/ # Scripts to reproduce all figures
+│   ├── main_figs/ # main manucript figures
+│   ├── ed_figs/ # extended data figures
+│   ├── supp_figs/ # supplemental data figures
+│   ├── extra_data/ # Extra data related to creation of figures but not data from the primary experiment 
 │   └── ...
 │
 └── README.md
@@ -28,7 +31,9 @@ This repository contains all data and scripts used for the analyses and figures 
   - **Wrangling scripts** (`scripts/`): Code to clean and adjust data following procedures described in the manuscript.  
 
 - **Figures folder**  
-  Contains all R scripts needed to reproduce the figures from the manuscript using the processed data.  
+  Contains all R scripts needed to reproduce the figures from the manuscript using the processed data.
+
+  Complex I AA changes are given in `/figures/extra_data/CI_chain_snps.tsv`.
 
 ---
 
