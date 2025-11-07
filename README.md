@@ -39,12 +39,14 @@ This repository contains all data and scripts used for the analyses and figures 
 
 ## Reproducibility
 
-All analyses were conducted in R (version 4.4.0). The required R packages are listed and loaded within each script. To reproduce analyses or figures:  
+Most analyses were conducted in R (version 4.4.0). The required R packages are listed and loaded within each script. To reproduce analyses or figures:  
 
 1. Clone this repository.  
 2. Open the `.Rproj` file in RStudio.  
 3. Run the scripts in the trait folders to wrangle and adjust raw data.  
-4. Use the scripts in `figures/` to generate the figures in the manuscript.  
+4. Use the scripts in `figures/` to generate the figures in the manuscript.
+
+Protein figures were made using Python (version 3.12.12) with pymol-open-source (version 3.1.0).
 
 ---
 
