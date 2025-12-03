@@ -52,7 +52,10 @@ Protein figures were made using Python (version 3.12.12) with pymol-open-source 
 
 ## Citation
 
-If you use this code or data, please cite the accompanying manuscript:  
+If you use this code or data, please cite the accompanying manuscript: 
 
-*Author(s), Title, Year, Journal/Preprint DOI*  
+Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in _Drosophila_
+Leah J. Darwin, Faye A. Lemieux, Rebecca Z. Bachtel, Jack H. Blocker, Camille P. Brown, Jacob D. Lerman, Olivia C. Maule, Yevgeniy Raynes, David M. Rand
+bioRxiv 2025.11.24.689096; doi: https://doi.org/10.1101/2025.11.24.689096 
+
 
