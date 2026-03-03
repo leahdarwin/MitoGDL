@@ -58,6 +58,8 @@ Genetic and environmental interactions outweigh mitonuclear coevolution for comp
 Leah J. Darwin, Faye A. Lemieux, Rebecca Z. Bachtel, Jack H. Blocker, Camille P. Brown, Jacob D. Lerman, Olivia C. Maule, Yevgeniy Raynes, David M. Rand
 bioRxiv 2025.11.24.689096; doi: https://doi.org/10.1101/2025.11.24.689096 
 
+---
+
 ## ⚠️ ggtree + aplot + ggplot2 Compatibility Note
 
 **ggplot2 4.x is currently incompatible with ggtree 3.12.0 and aplot.**
