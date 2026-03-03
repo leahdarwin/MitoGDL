@@ -58,4 +58,36 @@ Genetic and environmental interactions outweigh mitonuclear coevolution for comp
 Leah J. Darwin, Faye A. Lemieux, Rebecca Z. Bachtel, Jack H. Blocker, Camille P. Brown, Jacob D. Lerman, Olivia C. Maule, Yevgeniy Raynes, David M. Rand
 bioRxiv 2025.11.24.689096; doi: https://doi.org/10.1101/2025.11.24.689096 
 
+# ⚠️ ggtree + aplot + ggplot2 Compatibility Note
+
+**ggplot2 4.x is currently incompatible with ggtree 3.12.0 and aplot.**
+
+ggplot2 4.0.0 removed internal functions (including `is.waive()` and `is_ggplot()`) that ggtree and aplot depend on, causing the following errors:
+
+```
+Error in `geom_segment2()`:
+! Problem while converting geom to grob.
+Caused by error in `is.waive()`:
+! could not find function "is.waive"
+```
+
+```
+Error: package or namespace load failed for 'aplot':
+ object 'is_ggplot' is not exported by 'namespace:ggplot2'
+```
+
+### Workaround
+
+Downgrade ggplot2 to the last stable 3.x release:
+
+```r
+remove.packages("ggplot2")
+install.packages("remotes")
+remotes::install_version("ggplot2", version = "3.5.1")
+```
+
+Restart R after installing.
+
+This issue is expected to be resolved in a future ggtree update. Track progress on the [ggtree GitHub](https://github.com/YuLab-SMU/ggtree/issues).
+
 
