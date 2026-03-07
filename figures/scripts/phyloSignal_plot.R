@@ -9,14 +9,29 @@
 ############################################################
 
 # Load required libraries
-packages <- c("ape", "phytools", "picante", "dplyr", "tidyr", "aplot", "ggtree", "patchwork", "cowplot")
+cran_packages <- c("ape", "ggplot2", "phytools", "picante", "dplyr", "tidyr",
+                   "aplot", "patchwork", "cowplot", "knitr", "kableExtra")
+bioc_packages <- c("ggtree")
+
 installed <- rownames(installed.packages())
-for (p in packages) {
+
+for (p in cran_packages) {
   if (!(p %in% installed)) {
     install.packages(p, dependencies = TRUE)
   }
 }
-lapply(packages, library, character.only = TRUE)
+
+if (!requireNamespace("BiocManager", quietly = TRUE)){
+  install.packages("BiocManager")
+}
+for (p in bioc_packages) {
+  if (!(p %in% installed)) {
+    BiocManager::install(p)
+  }
+}
+
+lapply(c(cran_packages, bioc_packages), library, character.only = TRUE)
+
 
 
 #-----------------------------------------------------------
@@ -39,10 +54,11 @@ get_k_sig <- function(condition, df) {
   
   #print(trait)  # Debugging: check trait vector
   
-  # Run phylogenetic signal test
-  invisible(
-    capture.output(
-      phylosig(mttree, trait, method = "K", test = TRUE)))
+  # Run phylogenetic signal test (suppress printed output, return object)
+  capture.output(
+    result <- phylosig(mttree, trait, method = "K", test = TRUE)
+  )
+  return(result)
 }
 
 
@@ -122,6 +138,43 @@ Kfly    <- apply(conditions, 1, get_k_sig, df = flight)
 Kdev    <- apply(cond_dev, 1, get_k_sig, df = dev)
 Kweight <- apply(conditions, 1, get_k_sig, df = weight)
 
+
+#-----------------------------------------------------------
+# Extract K results and print kable table
+#-----------------------------------------------------------
+extract_k <- function(k_list, conds, trait) {
+  data.frame(
+    Trait     = trait,
+    Nuc       = conds$Nuc,
+    Treatment = conds$Treatment,
+    Sex       = conds$Sex,
+    K         = sapply(k_list, function(x) x$K),
+    p         = sapply(k_list, function(x) x$P)
+  )
+}
+
+k_tab <- rbind(
+  extract_k(Kclimb,  conditions, "Climbing"),
+  extract_k(Kfly,    conditions, "Flight"),
+  extract_k(Kdev,    cond_dev,   "Development"),
+  extract_k(Kweight, conditions, "Weight")
+)
+
+print(
+  kable(k_tab,
+        format    = "latex",
+        booktabs  = TRUE,
+        linesep   = "",
+        escape    = FALSE,
+        digits    = rep(3, 6),
+        col.names = c("Trait", "Nuc", "Treatment", "Sex", "$K$", "$p$")) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(1, width = "6em")
+)
 
 #-----------------------------------------------------------
 # Define a custom ggplot2 theme for tree plots
@@ -252,4 +305,4 @@ combined_plot <- p1 %>%
   insert_right(p4)
 
 # Save to PDF
-ggsave("figures/phyloSignal_EDfig2.pdf", combined_plot, width = 14, height = 5)
+ggsave("figures/supp_figs/phyloSignal_Sfig2.pdf", combined_plot, width = 14, height = 5)

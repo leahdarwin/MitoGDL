@@ -30,7 +30,7 @@ set.seed(99)
 cv <- function(x) sd(x) / mean(x)
 
 # Bootstrap CV values
-boot_cv <- function(x, n = 500) {
+boot_cv <- function(x, n = 1000) {
   replicate(n, cv(sample(x, replace = TRUE)))
 }
 
@@ -54,7 +54,7 @@ get_var_df <- function(df) {
 }
 
 # Make bootstrapped CV plot
-make_cv_plot <- function(df, trait, trait_color) {
+make_cv_plot <- function(df, trait) {
   boot_climb <- df %>% 
     group_by(Mito, Nuc, Sex, Treatment) %>%
     summarise(Y_adj = mean(Y_adj), .groups = "drop_last") %>%
@@ -78,18 +78,7 @@ make_cv_plot <- function(df, trait, trait_color) {
           panel.grid.minor = element_blank(),
           panel.border = element_blank(),
           axis.line.x = element_line(size = 0.5, colour = "black"),
-          axis.line.y = element_line(size = 0.5, colour = "black")) +
-    theme(
-      plot.title = element_textbox_simple(
-        size = 16, lineheight = 1, halign = 0.5,
-        fill = trait_color, padding = margin(5, 5, 5, 5),
-        margin = margin(0, 0, 5, 47)
-      ),
-      plot.title.position = "plot",
-      legend.position = "inside",
-      legend.position.inside = c(0.95, 0.9),
-      text = element_text(size = 16)
-    )
+          axis.line.y = element_line(size = 0.5, colour = "black")) 
 }
 
 # Bootstrap-based p-values
@@ -146,7 +135,7 @@ get_corr_df = function(df){
 }
 
 # Define sex color palette
-sex_colors <- c("F" = "lightgrey", "M" = "gray14")
+sex_colors <- c("F" = "#e7298a", "M" = "#1b9e77")
 
 # Load datasets -----------------------------------------------------------
 
@@ -189,9 +178,9 @@ weight <- read.csv("weight/data/weight_adj.csv") %>%
 # Run analyses ------------------------------------------------------------
 
 # Bootstrapped CV plots + p-values
-pbootclimb   <- make_cv_plot(climb,  "Climbing Velocity", "#b3cde3")
-pbootweight  <- make_cv_plot(weight, "Weight", "#fbb4ae")
-pbootflight  <- make_cv_plot(flight, "Flight Performance", "#ccebc5")
+pbootclimb   <- make_cv_plot(climb,  "Climbing Velocity")
+pbootweight  <- make_cv_plot(weight, "Weight")
+pbootflight  <- make_cv_plot(flight, "Flight Performance")
 
 bootpvals_climb  <- get_boot_pvals(climb)  %>% mutate(Trait = "climb")
 bootpvals_weight <- get_boot_pvals(weight) %>% mutate(Trait = "weight")
@@ -205,7 +194,7 @@ combined_plot <- pbootclimb + theme(legend.position = "none") +
   pbootflight + labs(y = "")
 
 # Save to PDF
-ggsave("figures/ed_figs/mothersCurse_EDfig1.pdf", combined_plot, width = 15, height = 6)
+ggsave("figures/supp_figs/mothersCurse_Sfig1.pdf", combined_plot, width = 15, height = 6)
 
 # Correlation results
 corrdf <- rbind(get_corr_df(weight) %>% mutate(Trait="weight"),
@@ -222,15 +211,31 @@ vardf <- rbind(get_var_df(weight) %>% mutate(Trait="weight"),
 corvar <- corrdf %>%
   inner_join(vardf,   join_by(Nuc, Treatment, Trait)) %>%
   inner_join(rbind(
-    climb  %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% mutate(Trait = "climb"),
-    weight %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% mutate(Trait = "weight"),
-    flight %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% mutate(Trait = "flight")
-  ), join_by(Nuc, Treatment, Trait), relationship = "many-to-many") %>%
+    climb  %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% distinct() %>% mutate(Trait = "climb"),
+    weight %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% distinct() %>% mutate(Trait = "weight"),
+    flight %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% distinct() %>% mutate(Trait = "flight")
+  ), join_by(Nuc, Treatment, Trait)) %>%
   mutate(r = paste0(round(r,4), " (", round(p,4), ")"),
          F_stat = paste0(round(F_stat,4), " (", round(p_value,4), ")")) %>%
   select(-c(p, p_value)) %>%
-  select(Trait, Nuc, Treatment, Sex, group_var, F_stat, r)
+  select(Trait, Nuc, Treatment, Sex, group_var, F_stat, r) %>%
+  tidyr::pivot_wider(names_from = Sex, values_from = group_var,
+                     names_prefix = "Var_") %>%
+  select(Trait, Nuc, Treatment, Var_F, Var_M, F_stat, r)
 
 # Table output
-kable(cvboot_df, format = "latex", digits = 4) %>%
-  kable_styling()
+corvar %>%
+  kable(
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    digits    = rep(4, 7),
+    col.names = c("Trait", "Nuc", "Treatment", "Female Var", "Male Var", "$F$ ($p$)", "$r$ ($p$)")
+  ) %>%
+  kable_styling(
+    latex_options = c("hold_position"),
+    full_width    = FALSE,
+    font_size     = 10
+  ) %>%
+  column_spec(2, width = "6em")

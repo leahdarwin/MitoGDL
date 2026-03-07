@@ -35,7 +35,7 @@ climb <- read.csv("climb/data/climb.csv", header = TRUE)
 phenos_correct <- climb %>%
   na.omit() %>%
   group_by(Set, Sex, Treatment) %>%
-  filter((Mito %in% c("yak", "sm21") & Build == "A") | Build == "parental") %>%
+  filter((Mito %in% c("yak", "siI") & Build == "A") | Build == "parental") %>%
   summarise(Set_adj = mean(Slope), .groups = "drop")
 
 # Across-set correction term

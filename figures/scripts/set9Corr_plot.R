@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------
 # Load libraries
 # -------------------------------------------------------------------
-packages <- c("dplyr", "ggplot2", "patchwork")
+packages <- c("dplyr", "ggplot2", "patchwork", "knitr", "kableExtra")
 
 installed <- rownames(installed.packages())
 for (p in packages) {
@@ -32,7 +32,7 @@ weight <- read.csv("weight/data/weight_adj.csv") %>% rename(Y = weight_per_fly)
 stocks <- unique(climb$Stock[climb$Set == 9])
 
 # Colors for sex-specific plots
-sex_colors <- c("F" = "lightgrey", "M" = "gray34")
+sex_colors <-  c("F" = "#e7298a", "M" = "#1b9e77")
 
 # -------------------------------------------------------------------
 # Function: Prepare merged dataset for split vs. unified experiments
@@ -70,18 +70,23 @@ get_merged_df <- function(df) {
 # Function: Compute correlations and return a ggplot
 # -------------------------------------------------------------------
 get_corr <- function(merged, trait) {
-  
+
   if (trait %in% c("Weight", "Climbing")) {
     # Female-specific correlation
     mergedF <- merged %>% filter(Sex == "F")
-    message(trait, " (females):")
-    print(cor.test(mergedF$Y.x, mergedF$Y.y, method = "spearman"))
-    
+    testF    <- cor.test(mergedF$Y.x, mergedF$Y.y, method = "spearman")
+
     # Male-specific correlation
     mergedM <- merged %>% filter(Sex == "M")
-    message(trait, " (males):")
-    print(cor.test(mergedM$Y.x, mergedM$Y.y, method = "spearman"))
-    
+    testM    <- cor.test(mergedM$Y.x, mergedM$Y.y, method = "spearman")
+
+    corr_tab <- data.frame(
+      Trait  = trait,
+      Sex    = c("F", "M"),
+      rho    = c(testF$estimate, testM$estimate),
+      p      = c(testF$p.value, testM$p.value)
+    )
+
     # Plot with sex colors
     p <- ggplot(merged, aes(x = rank.x, y = rank.y, color = Sex)) +
       geom_point(size = 3) +
@@ -93,12 +98,18 @@ get_corr <- function(merged, trait) {
         y = "Rank in Unified Experiment"
       ) +
       theme_minimal(base_size = 14)
-    
+
   } else {
     # Sex not relevant (development)
-    message(trait, ":")
-    print(cor.test(merged$Y.x, merged$Y.y, method = "spearman"))
-    
+    testMF <- cor.test(merged$Y.x, merged$Y.y, method = "spearman")
+
+    corr_tab <- data.frame(
+      Trait  = trait,
+      Sex    = "MF",
+      rho    = testMF$estimate,
+      p      = testMF$p.value
+    )
+
     # Plot without sex colors
     p <- ggplot(merged, aes(x = rank.x, y = rank.y)) +
       geom_point(size = 3) +
@@ -110,7 +121,23 @@ get_corr <- function(merged, trait) {
       ) +
       theme_minimal(base_size = 14)
   }
-  
+
+  print(
+    kable(corr_tab,
+          format    = "latex",
+          booktabs  = TRUE,
+          linesep   = "",
+          escape    = FALSE,
+          digits    = rep(3, 4),
+          col.names = c("Trait", "Sex", "$\\rho$", "$p$")) %>%
+      kable_styling(
+        latex_options = c("hold_position"),
+        full_width    = FALSE,
+        font_size     = 10
+      ) %>%
+      column_spec(1, width = "6em")
+  )
+
   return(p)
 }
 
@@ -129,5 +156,5 @@ p3 <- get_corr(merged_dev,    "Development")
 combined_plot <- p3 + p1 + theme(legend.position = "none") + p2
 
 # Save to PDF
-ggsave("figures/set9Corr_figS4.pdf", combined_plot, width = 11, height = 4)
+ggsave("figures/supp_figs/set9Corr_figS4.pdf", combined_plot, width = 11, height = 4)
 

@@ -73,14 +73,35 @@ r2_nakagawa(climb_lm)
 # Effect size R²
 r2_climb <- r2beta(climb_lm)
 
+# Helper: publication-ready kable for ANOVA tables
+fmt_kable <- function(tab) {
+  tab <- tab %>%
+    mutate(p.value = format.pval(p.value, digits = 3, eps = 0.001))
+  kable(
+    tab,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    digits    = rep(4, 8),
+    col.names = c("Trait", "Term", "SS", "MS", "$df$", "$F$", "$p$", "$R^2$")
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(2, width = "10em")
+}
+
 # Format ANOVA table with effect sizes
 climb_aov_tab <- tidy(climb_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_climb %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_climb %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Climb") %>%
+  select(trait, everything())
 
-kable(climb_aov_tab, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(climb_aov_tab)
 
 ## ---------------------------
 ## Female-only model
@@ -97,11 +118,11 @@ r2_climbF <- r2beta(climbF_lm)
 
 climbF_aov_tab <- tidy(climbF_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_climbF %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_climbF %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Climbing") %>%
+  select(trait, everything())
 
-kable(climbF_aov_tab, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(climbF_aov_tab)
 
 ## ---------------------------
 ## Male-only model
@@ -118,9 +139,9 @@ r2_climbM <- r2beta(climbM_lm)
 
 climbM_aov_tab <- tidy(climbM_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_climbM %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_climbM %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Climbing") %>%
+  select(trait, everything())
 
-kable(climbM_aov_tab, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(climbM_aov_tab)
 

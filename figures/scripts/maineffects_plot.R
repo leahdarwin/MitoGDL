@@ -11,8 +11,7 @@
 ## -------------------------------------------------------------------
 packages = c(
   "dplyr", "ggplot2", "patchwork",
-  "lme4", "lmerTest", "emmeans",
-  "ggpubr", "ggtext"
+  "lme4", "lmerTest", "emmeans", "grid"
 )
 
 new_pkgs = setdiff(packages, rownames(installed.packages()))
@@ -190,6 +189,9 @@ weightM_lm = lmer(
   data = weightM
 )
 
+weightM_plot_nuc = plot_nuc_means(weightM, weightM_lm) +
+  labs(y = "Weight (mg)")
+
 weightM_plot_mt = plot_mito_means(weightM, weightM_lm) +
   labs(y = "Weight (mg)")
 
@@ -206,10 +208,10 @@ climbM_lm = lmer(
 )
 
 climbM_plot_treat = plot_treatment_means(climbM, climbM_lm) +
-  labs(y = "Climbing speed (cm/s)")
+  labs(y = "Climbing \nspeed (cm/s)")
 
 climbM_plot_nuc = plot_nuc_means(climbM, climbM_lm) +
-  labs(y = "Climbing speed (cm/s)")
+  labs(y = "Climbing \nspeed (cm/s)")
 
 
 ## --------------------------
@@ -279,6 +281,20 @@ dev_plot_nuc = plot_nuc_means(dev, dev_lm) +
   labs(y = "Development \ntime (days)")
 
 
+##---------------------------------------------------------------
+##Text grobs for annotations
+female_grob <- textGrob("Females", 
+                        x = unit(0.5, "npc"),  # Center horizontally in npc units
+                        y = unit(0.96, "npc"),  # Near the top in npc units
+                        gp = gpar(fontsize = 8, col="grey30")) 
+
+male_grob <- textGrob("Males", 
+                      x = unit(0.4, "npc"),  # Center horizontally in npc units
+                      y = unit(0.96, "npc"),  # Near the top in npc units
+                      gp = gpar(fontsize = 8, col="grey30")) 
+## ---------------------------------------------------------------
+
+
 # ===================================================================
 # Combine plots into panels
 # ===================================================================
@@ -287,37 +303,54 @@ dev_plot_nuc = plot_nuc_means(dev, dev_lm) +
 ## Treatment effects
 ## ---------------------------------------------------------------
 treat = (
-  flightM_plot_treat + 
+    flightM_plot_treat + ylim(c(0.55, 0.95)) +
+      annotation_custom(male_grob) +
+    climbF_plot_treat + ylim(c(0.4, 5.2)) +
+      annotation_custom(female_grob) +
+    climbM_plot_treat + ylim(c(0.4, 5.2)) +
+      annotation_custom(male_grob) +
     dev_plot_treat + 
-    climbF_plot_treat + ylim(c(0.3, 4.8)) +
-    climbM_plot_treat + ylim(c(0.3, 4.8)) +
-    labs(y = "")
+    plot_spacer() +
+    plot_layout(axis_titles = "collect")
 ) & 
   scale_x_discrete(labels = c("Control" = "C", "Rotenone" = "R"))
 
 treat
+
+
 ## ---------------------------------------------------------------
 ## Nuclear background effects
 ## ---------------------------------------------------------------
 nuc = (
-  flightF_plot_nuc + ylim(c(0.55, 0.91)) +
-    flightM_plot_nuc + ylim(c(0.55, 0.91)) + labs(y = "") +
-    dev_plot_nuc +
-    climbF_plot_nuc + ylim(c(0.4, 4.8)) +
-    climbM_plot_nuc + ylim(c(0.4, 4.8)) + labs(y = "") +
-    weightF_plot_nuc
-)
+  flightF_plot_nuc + ylim(c(0.55, 0.95)) +
+      annotation_custom(female_grob) +
+    flightM_plot_nuc + ylim(c(0.55, 0.95))+
+      annotation_custom(male_grob) +
+    climbF_plot_nuc + ylim(c(0.4, 5.2)) +
+      annotation_custom(female_grob) +
+    climbM_plot_nuc + ylim(c(0.4, 5.2)) +
+      annotation_custom(male_grob) +
+    weightF_plot_nuc + ylim(c(0.25,1.6)) +
+      annotation_custom(female_grob) +
+    weightM_plot_nuc + ylim(c(0.25,1.6)) +
+      annotation_custom(male_grob) +
+    dev_plot_nuc 
+) + plot_layout(nrow=2, axis_titles = "collect")
 
 nuc
+
+## ---------------------------------------------------------------
+## mtDNA background effects
+## ---------------------------------------------------------------
+
+mito = (weightF_plot_mt + ylim(c(0.25,1.6)) + annotation_custom(female_grob))/ (weightM_plot_mt  + ylim(c(0.25,1.6)) + annotation_custom(male_grob)) / (climbF_plot_mt  + ylim(c(0.4, 5.2)) + annotation_custom(female_grob))
+
+mito
+
 # ===================================================================
 # Combine all panels
 # ===================================================================
-nuc_treat = (nuc | treat) + 
-  plot_layout(widths = c(1, 0.66), guides = "collect")
-mito = weightF_plot_mt / weightM_plot_mt / climbF_plot_mt
 
-final = nuc_treat / mito +
-  plot_layout(heights = c(0.6,1))
+final = ((wrap_elements(nuc)|wrap_elements(treat)) + plot_layout(widths = c(1, 0.66))) / wrap_elements(mito) + plot_layout(heights = c(0.6,1)) + plot_annotation(tag_levels = "a")
 
-ggsave("figures/main_figs/mainEffects_fig2.pdf", final, width = 6.5, height = 7.5)
-
+ggsave("figures/main_figs/mainEffects_fig2.pdf", final, width = 8, height = 8)

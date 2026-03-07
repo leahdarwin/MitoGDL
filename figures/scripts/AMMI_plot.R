@@ -24,6 +24,7 @@ lapply(packages, library, character.only = TRUE)
 ## Load and prepare climbing dataset
 ## ---------------------------------------------------------
 climb <- read.csv("climb/data/climb_adj.csv") %>%
+  na.omit() %>%
   group_by(Mito, Nuc, Treatment, Sex, Build) %>%
   summarise(climb = mean(Y_adj), .groups = "drop") %>%
   mutate(
@@ -42,7 +43,7 @@ color_palette <- c(
   "Zimbabwe"  = "#52C2BA",
   "D.yakuba"  = "#FCAB10",
   "D.simulans"= "#ED1C24",
-  "parent"    = "black"
+  "parental"    = "darkgrey"
 )
 
 ## ---------------------------------------------------------
@@ -60,9 +61,9 @@ make_plot <- function(df, name) {
       mitoOrig = case_when(
         grepl("B", name)      ~ "Beijing",
         grepl("Z", name)      ~ "Zimbabwe",
-        grepl("sm21", name)   ~ "D.simulans",
+        grepl("siI", name)   ~ "D.simulans",
         grepl("yak", name)    ~ "D.yakuba",
-        .default              = name
+        .default              = "parental"
       )
     )
   
@@ -113,7 +114,7 @@ make_plot <- function(df, name) {
     ggtitle(name) +
     xlab(paste0("PC1 (", model$analysis$percent[1], "%)")) +
     ylab(paste0("PC2 (", model$analysis$percent[2], "%)")) +
-    coord_cartesian(ylim = c(-0.75, 1.1), xlim = c(-1.1, 0.9)) +
+ #   coord_cartesian(ylim = c(-0.75, 1.1), xlim = c(-1.1, 0.9)) +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank())
 }
@@ -132,8 +133,7 @@ pF <- make_plot(climbF, "Female Climb")
 pM <- make_plot(climbM, "Male Climb")
 
 # Combine plots side by side
-combined_plot <- pF + pM
+combined_plot <- pF + pM + plot_annotation(tag_levels = "a")
 
 # Save to PDF
-ggsave("figures/main_figs/AMMI_fig4.pdf", combined_plot, width = 10, height = 5)
-
+ggsave("figures/main_figs/AMMI_fig4.pdf", combined_plot, width = 8, height = 5)

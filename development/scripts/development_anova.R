@@ -57,18 +57,40 @@ r2_nakagawa(dev_lm)
 r2_dev <- r2beta(dev_lm)
 
 ## ---------------------------------------------------------
+## Helper: publication-ready kable for ANOVA tables
+## ---------------------------------------------------------
+fmt_kable <- function(tab) {
+  tab <- tab %>%
+    mutate(p.value = format.pval(p.value, digits = 3, eps = 0.001))
+  kable(
+    tab,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    digits    = rep(4, 8),
+    col.names = c("Trait", "Term", "SS", "MS", "$df$", "$F$", "$p$", "$R^2$")
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(2, width = "10em")
+}
+
+## ---------------------------------------------------------
 ## Format ANOVA results
 ## - Join with effect sizes
 ## - Clean column structure
 ## ---------------------------------------------------------
 dev_aov <- tidy(dev_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_dev %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_dev %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Development") %>%
+  select(trait, everything())
 
 ## ---------------------------------------------------------
 ## Export results table
-## - LaTeX-compatible table with kable
 ## ---------------------------------------------------------
-kable(dev_aov, format = "latex", booktabs = TRUE,
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(dev_aov)

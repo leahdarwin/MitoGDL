@@ -118,7 +118,7 @@ make_plot <- function(comb, data) {
     theme_bw() +
     labs(color = "Nuclear Genotype") +
     theme(
-      legend.position = "none",
+      legend.position = "bottom",
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank()
     )
@@ -135,14 +135,14 @@ get_cor <- function(comb, nuc, data) {
 }
 
 # -------------------------------------------------------------------
-# Run correlation tests and print tables
+# Run correlation tests and print tables; return plots
 # -------------------------------------------------------------------
-run_corr_tests <- function(combs, merged_df, out_fig) {
+run_corr_tests <- function(combs, merged_df) {
   corr_results <- rbind(
     lapply(combs, get_cor, "375", merged_df),
     lapply(combs, get_cor, "Ore", merged_df)
   )
-  
+
   corr_tab <- as.data.frame(do.call(rbind, corr_results)) %>%
     `colnames<-`(c("Phenotype 1", "Phenotype 2", "Nuc", "Correlation coeff", "p-value")) %>%
     mutate(
@@ -151,28 +151,53 @@ run_corr_tests <- function(combs, merged_df, out_fig) {
       `Correlation coeff` = as.numeric(`Correlation coeff`),
       `p-value` = as.numeric(`p-value`)
     )
-  
-  # Print nicely to console
+
+  # Print nicely formatted LaTeX table
   print(
-    kable(corr_tab, format = "simple", digits = 3, align = "c")
+    kable(corr_tab,
+          format    = "latex",
+          booktabs  = TRUE,
+          linesep   = "",
+          escape    = FALSE,
+          digits    = rep(3, 5),
+          col.names = c("Phenotype 1", "Phenotype 2", "Nuc", "$r$", "$p$")) %>%
+      kable_styling(
+        latex_options = c("hold_position"),
+        full_width    = FALSE,
+        font_size     = 10
+      ) %>%
+      column_spec(2, width = "10em")
   )
-  
-  # Make plots and save to PDF
-  plots <- lapply(combs, make_plot, merged_df)
-  ggarrange(plotlist = plots, nrow = 2, ncol = 3, common.legend = TRUE, legend = "top") %>%
-    ggexport(filename = out_fig, width = 8, height = 5)
+
+  # Return plots for external assembly
+  lapply(combs, make_plot, merged_df)
 }
 
 # -------------------------------------------------------------------
 # Run for Females and Males
 # -------------------------------------------------------------------
-run_corr_tests(
-  combs_F, merged_F,
-  out_fig = "figures/supp_figs/phenoCorr_figS2a.pdf"
-)
+plots_F <- run_corr_tests(combs_F, merged_F)
+plots_M <- run_corr_tests(combs_M, merged_M)
 
-run_corr_tests(
-  combs_M, merged_M,
-  out_fig = "figures/supp_figs/phenoCorr_figS1b.pdf"
+# -------------------------------------------------------------------
+# Assemble into a single figure using patchwork
+# -------------------------------------------------------------------
+female_panel <- wrap_plots(plots_F, nrow = 2, ncol = 3) +
+  plot_layout(guides = "collect") +
+  plot_annotation(title = "Females") &
+  theme(legend.position = "bottom")
+
+male_panel <- wrap_plots(plots_M, nrow = 2, ncol = 3) +
+  plot_layout(guides = "collect") +
+  plot_annotation(title = "Males") &
+  theme(legend.position = "bottom")
+
+combined <- wrap_elements(female_panel) / wrap_elements(male_panel) +
+  plot_annotation(tag_levels = "a")
+
+ggsave(
+  "figures/supp_figs/phenoCorr_figS2.pdf",
+  combined,
+  width = 8, height = 10
 )
 

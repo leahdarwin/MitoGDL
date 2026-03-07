@@ -117,15 +117,15 @@ weight_dfs = get_dfs(emm_mito_weight)
 weight_contrast_plot = plot_contrast(weight_dfs$contrasts)
 weight_ixn_plot = plot_ixn_mtnuc(weight_dfs$emmeans) +
   labs(y = "EM mean weight (mg)") +
-  theme(legend.position = "none") +
-  theme(
-    axis.title.y = element_textbox_simple(
-      size = 16, lineheight = 1, halign = 0.5,
-      fill = "#fbb4ae", padding = margin(5, 5, 5, 5),
-      margin = margin(0, 0, 5, 0),
-      orientation = "left-rotated"
-    )
-  )
+  theme(legend.position = "none") #+
+  # theme(
+  #   axis.title.y = element_textbox_simple(
+  #     size = 16, lineheight = 1, halign = 0.5,
+  #     fill = "#fbb4ae", padding = margin(5, 5, 5, 5),
+  #     margin = margin(0, 0, 5, 0),
+  #     orientation = "left-rotated"
+  #   )
+  # )
 
 ### --- Development ---
 dev_lm = lmerTest::lmer(
@@ -139,15 +139,15 @@ dev_dfs = get_dfs(emm_mito_dev)
 dev_contrast_plot = plot_contrast(dev_dfs$contrasts)
 dev_ixn_plot = plot_ixn_mttreat(dev_dfs$emmeans) +
   labs(y = "EM mean development time (days)") +
-  theme(legend.position = "none") +
-  theme(
-    axis.title.y = element_textbox_simple(
-      size = 16, lineheight = 1, halign = 0.5,
-      fill = "#decbe4", padding = margin(5, 5, 5, 5),
-      margin = margin(0, 0, 5, 0),
-      orientation = "left-rotated"
-    )
-  )
+  theme(legend.position = "none") #+
+  # theme(
+  #   axis.title.y = element_textbox_simple(
+  #     size = 16, lineheight = 1, halign = 0.5,
+  #     fill = "#decbe4", padding = margin(5, 5, 5, 5),
+  #     margin = margin(0, 0, 5, 0),
+  #     orientation = "left-rotated"
+  #   )
+  # )
 
 ### --- Climbing (Males) ---
 climbM = climb %>% filter(Sex == "M")
@@ -179,20 +179,23 @@ climbF_dfs = get_dfs(emm_mito_climbF)
 climbF_contrast_plot = plot_contrast(climbF_dfs$contrasts)
 climbF_ixn_plot = plot_ixn_mttreat(climbF_dfs$emmeans) +
   labs(y = "EM mean climbing speed (cm/s)") +
-  theme(legend.position = "none") +
-  theme(
-    axis.title.y = element_textbox_simple(
-      size = 16, lineheight = 1, halign = 0.5,
-      fill = "#b3cde3", padding = margin(5, 5, 5, 5),
-      margin = margin(0, 0, 5, 0),
-      orientation = "left-rotated"
-    )
-  )
+  theme(legend.position = "none") #+
+  # theme(
+  #   axis.title.y = element_textbox_simple(
+  #     size = 16, lineheight = 1, halign = 0.5,
+  #     fill = "#b3cde3", padding = margin(5, 5, 5, 5),
+  #     margin = margin(0, 0, 5, 0),
+  #     orientation = "left-rotated"
+  #   )
+  # )
 
 ## -------------------------------------------------------------------
 ## Combine and save plots
 ## -------------------------------------------------------------------
-combined_plot = weight_ixn_plot | dev_ixn_plot | climbF_ixn_plot | climbM_ixn_plot
+combined_plot = (wrap_elements(weight_ixn_plot) | wrap_elements(dev_ixn_plot | climbF_ixn_plot | climbM_ixn_plot)) +  plot_layout(widths = c(1,3)) + plot_annotation(tag_levels = "a")
+
+combined_plot
+
 ggsave("figures/main_figs/secondOrderInteraction_fig3.pdf", combined_plot, width = 11, height = 4.5)
 
 
