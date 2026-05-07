@@ -47,3 +47,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Test plot function not included in manuscript
+figures/scripts/surv_plot.R

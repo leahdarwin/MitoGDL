@@ -63,15 +63,36 @@ r2_nakagawa(flight_lm)
 # Effect sizes
 r2_flight = r2beta(flight_lm)
 
+# Helper: publication-ready kable for ANOVA tables
+fmt_kable <- function(tab) {
+  tab <- tab %>%
+    mutate(p.value = format.pval(p.value, digits = 3, eps = 0.001))
+  kable(
+    tab,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    digits    = rep(4, 8),
+    col.names = c("Trait", "Term", "SS", "MS", "$df$", "$F$", "$p$", "$R^2$")
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(2, width = "10em")
+}
+
 # Merge ANOVA and effect size tables
 flight_aov = tidy(flight_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_flight %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_flight %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Flight") %>%
+  select(trait, everything())
 
 # Format for LaTeX output
-kable(flight_aov, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(flight_aov)
 
 # -------------------------------------------------------------------------
 # Mixed-model analysis: females
@@ -92,12 +113,12 @@ r2_flightF = r2beta(flightF_lm)
 # Merge ANOVA and effect size tables
 flightF_aov = tidy(flightF_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_flightF %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_flightF %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Flight") %>%
+  select(trait, everything())
 
 # Format for LaTeX output
-kable(flightF_aov, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(flightF_aov)
 
 # -------------------------------------------------------------------------
 # Mixed-model analysis: males
@@ -118,10 +139,10 @@ r2_flightM = r2beta(flightM_lm)
 # Merge ANOVA and effect size tables
 flightM_aov = tidy(flightM_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_flightM %>% select(c(Effect, Rsq)), join_by(term == Effect))
+  left_join(r2_flightM %>% select(c(Effect, Rsq)), join_by(term == Effect)) %>%
+  mutate(trait = "Flight") %>%
+  select(trait, everything())
 
 # Format for LaTeX output
-kable(flightM_aov, format = "latex", booktabs = TRUE, 
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(flightM_aov)
 

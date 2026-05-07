@@ -31,7 +31,8 @@ options(contrasts = c("contr.sum", "contr.poly"))  # treatment contrasts for Typ
 ## ---------------------------------------------------------
 weight <- read.csv("weight/data/weight_adj.csv") %>%
   filter(!Mito %in% c("Ore", "375")) %>%  # remove unwanted mitochondrial lines
-  mutate(Y_adj = Y_adj * 1000)            # rescale phenotype
+  mutate(Y_adj = Y_adj * 1000) # rescale phenotype
+ 
 
 ## Stratify by sex
 weightF <- weight %>% filter(Sex == "F")
@@ -53,13 +54,34 @@ weight_aov
 r2_nakagawa(weight_lm)                # Marginal & conditional R²
 r2_weight <- r2beta(weight_lm)       # Effect sizes (R² per term)
 
+## Helper: publication-ready kable for ANOVA tables
+fmt_kable <- function(tab) {
+  tab <- tab %>%
+    mutate(p.value = format.pval(p.value, digits = 3, eps = 0.001))
+  kable(
+    tab,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    digits    = rep(4, 8),
+    col.names = c("Trait", "Term", "SS", "MS", "$df$", "$F$", "$p$", "$R^2$")
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(2, width = "10em")
+}
+
 weight_aov <- tidy(weight_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_weight %>% select(Effect, Rsq), join_by(term == Effect))
+  left_join(r2_weight %>% select(Effect, Rsq), join_by(term == Effect)) %>%
+  mutate(trait = "Weight") %>%
+  select(trait, everything())
 
-kable(weight_aov, format = "latex", booktabs = TRUE,
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(weight_aov)
 
 ## ---------------------------------------------------------
 ## Female-only model
@@ -68,7 +90,7 @@ weightF_lm <- lmer(
   Y_adj ~ Mito * Nuc * Treatment + (1 | Mito:Nuc:Build),
   data = weightF
 )
-
+s
 weightF_aov <- anova(weightF_lm)
 weightF_aov
 
@@ -77,29 +99,30 @@ r2_weightF <- r2beta(weightF_lm)
 
 weightF_aov <- tidy(weightF_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_weightF %>% select(Effect, Rsq), join_by(term == Effect))
+  left_join(r2_weightF %>% select(Effect, Rsq), join_by(term == Effect)) %>%
+  mutate(trait = "Weight") %>%
+  select(trait, everything())
 
-kable(weightF_aov, format = "latex", booktabs = TRUE,
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(weightF_aov)
 
 ## ---------------------------------------------------------
 ## Male-only model
 ## ---------------------------------------------------------
 weightM_lm <- lmer(
-  Y_adj ~ Mito * Nuc * Treatment + (1 | Mito:Nuc:Build),
+  Y_adj ~ Mito * Nuc * Treatment  + (1 | Mito:Nuc:Build),
   data = weightM
 )
 
 weightM_aov <- anova(weightM_lm)
+weightM_aov
 
 r2_nakagawa(weightM_lm)
 r2_weightM <- r2beta(weightM_lm)
 
 weightM_aov <- tidy(weightM_aov) %>%
   select(-DenDF) %>%
-  left_join(r2_weightM %>% select(Effect, Rsq), join_by(term == Effect))
+  left_join(r2_weightM %>% select(Effect, Rsq), join_by(term == Effect)) %>%
+  mutate(trait = "Weight") %>%
+  select(trait, everything())
 
-kable(weightM_aov, format = "latex", booktabs = TRUE,
-      digits = c(0, 4, 4, 0, 4, 4, 4)) %>%
-  kable_styling(latex_options = c("hold_position"))
+fmt_kable(weightM_aov)
