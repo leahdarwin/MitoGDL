@@ -208,6 +208,6 @@ p3 <- plot_ixn_stability(sub_res_weightF, n_mito_vals, title = "Female Weight")
 p4 <- plot_ixn_stability(sub_res_weightM, n_mito_vals, title = "Male Weight")
 p5 <- plot_ixn_stability(sub_res_dev,     n_mito_vals, title = "Development Time")
 
-final <- ((p1 + p2) / (p3 + p4) / (p5+plot_spacer())) + plot_layout(guides="collect", axis_titles="collect")
+final <- ((p1 + p2 + p3) / (p3 + p4 + p5)) + plot_layout(guides="collect", axis_titles="collect")
 saveRDS(final, "figures/supp_figs/ixn_subsample.rds")
 ggsave("figures/supp_figs/ixn_subsample.pdf", final, width = 8, height = 16)
