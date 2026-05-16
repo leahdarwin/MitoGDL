@@ -151,14 +151,14 @@ plot_ixn_stability <- function(sub_res_list, n_mito_vals, alpha = 0.05/4,
   combined <- do.call(rbind, Filter(Negate(is.null), combined))
 
   ixn <- combined[grepl(":", combined$term), ]
-  ixn$n_mito_label <- factor(paste0("n = ", ixn$n_mito),
-                              levels = paste0("n = ", sort(unique(ixn$n_mito))))
+  ixn$n_mito_label <- factor(paste0("k = ", ixn$n_mito),
+                              levels = paste0("k = ", sort(unique(ixn$n_mito))))
 
   # Proportion of draws where each term is significant, per n_mito level
   sig_prop <- ixn %>%
     group_by(term, n_mito_label) %>%
     summarise(prop_sig = mean(p_value < alpha), .groups = "drop") %>%
-    mutate(label = paste0(round(prop_sig * 100), "% sig."),
+    mutate(label = as.character(round(prop_sig, 2)),
            y     = max(-log10(ixn$p_value), na.rm = TRUE) * 1.02)
 
   ggplot(ixn, aes(x = n_mito_label, y = -log10(p_value), fill = n_mito_label)) +
@@ -173,7 +173,7 @@ plot_ixn_stability <- function(sub_res_list, n_mito_vals, alpha = 0.05/4,
     labs(x = NULL, y = expression(-log[10](italic(p))), title = title) +
     theme_classic(base_size = 12) +
     theme(
-      axis.text.x      = element_text(size = 8),
+      axis.text.x      = element_text(size = 8, angle = 45, hjust = 1),
       strip.placement  = "outside",
       strip.background = element_blank(),
       strip.text       = element_text(size = 9, color = "black")
@@ -208,6 +208,6 @@ p3 <- plot_ixn_stability(sub_res_weightF, n_mito_vals, title = "Female Weight")
 p4 <- plot_ixn_stability(sub_res_weightM, n_mito_vals, title = "Male Weight")
 p5 <- plot_ixn_stability(sub_res_dev,     n_mito_vals, title = "Development Time")
 
-final <- p1 / p2 / p3 / p4 / p5
+final <- ((p1 + p2) / (p3 + p4) / (p5+plot_spacer())) + plot_layout(guides="collect", axis_titles="collect")
 saveRDS(final, "figures/supp_figs/ixn_subsample.rds")
-ggsave("figures/supp_figs/ixn_subsample.pdf", final, width = 12, height = 20)
+ggsave("figures/supp_figs/ixn_subsample.pdf", final, width = 8, height = 16)
