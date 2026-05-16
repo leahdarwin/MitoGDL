@@ -50,23 +50,10 @@ p2 = ggplot(joinedM, aes(x=Larval_density, y=Y_adj*1000)) +
            label = lm_label(joinedM), size = 3) +
   labs(title="Males", y="Weight (mg)", x="Estimated larval density")
 
-p1+p2
+weight_ps = p1+p2
+ggsave("figures/supp_figs/weight_density.pdf", width=8, height=3)
 
-rep_test = ld_mean %>%
-  mutate(Condition = paste(Mito,Nuc,Build,sep=";")) %>%
-  filter(Condition %in% c("siI;375;A","siI;Ore;A","yak;375;A","yak;Ore;A","375;375;parental","Ore;Ore;parental"))
 
-rep_mod = lm(Larval_density ~ Condition*Treatment, data = rep_test)
-anova(rep_mod)
-
-ggplot(rep_test, aes(x =Condition, y=Larval_density, fill=Treatment)) +
-  geom_boxplot(outlier.shape = NA, alpha=0.5) + # Hide outliers to avoid double-plotting
-  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75), 
-             aes(color = Treatment)) +
-  theme_linedraw() +
-  scale_fill_manual(values = c("Control" = "black", "Rotenone" = "#723a83")) +
-  scale_color_manual(values = c("Control" = "black", "Rotenone" = "#723a83"))  +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
 
 
