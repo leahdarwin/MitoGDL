@@ -1,0 +1,136 @@
+############################################################
+# Script: surv_ANOVA.R
+# Author: Leah Darwin
+# Date: 2026-05-05
+# Purpose: Perform ANOVAs on adult survival counts and produce
+#          separate LaTeX ANOVA and estimated marginal means 
+#          tables via kable booktabs.
+############################################################
+
+# -------------------------------------------------------------------------
+# Load required libraries (install if missing)
+# -------------------------------------------------------------------------
+packages <- c("dplyr", "broom", "emmeans", "knitr", "kableExtra", "effectsize")
+
+installed <- rownames(installed.packages())
+for (p in packages) {
+  if (!(p %in% installed)) install.packages(p, dependencies = TRUE)
+}
+lapply(packages, library, character.only = TRUE)
+
+# -------------------------------------------------------------------------
+# Load data
+# -------------------------------------------------------------------------
+egg_count <- read.csv("data/survival/survival.csv") %>% mutate(Total = F_total + M_total)
+
+# -------------------------------------------------------------------------
+# Helpers
+# -------------------------------------------------------------------------
+
+# Tidy ANOVA table (no residuals row) with partial eta-squared
+tidy_aov <- function(model) {
+  eta2 <- eta_squared(model, partial = TRUE) %>% select(Parameter, Eta2_partial)
+  tidy(anova(model)) %>%
+    filter(term != "Residuals") %>%
+    select(term, df, sumsq, meansq, statistic, p.value) %>%
+    left_join(eta2, by = join_by(term == Parameter)) %>%
+    mutate(
+      across(c(sumsq, meansq, statistic, Eta2_partial), ~round(., 4)),
+      p.value = format.pval(p.value, digits = 3, eps = 0.001)
+    )
+}
+
+# Tidy EMMs using the supplied spec; keeps all columns emmeans returns
+tidy_emm <- function(model, spec) {
+  as.data.frame(emmeans(model, spec)) %>%
+    mutate(across(where(is.numeric), ~round(., 4)))
+}
+
+# kable for ANOVA results, rows grouped by trait via pack_rows
+anova_table <- function(models, labels) {
+  aov_list <- lapply(models, tidy_aov)
+  aov_n    <- sapply(aov_list, nrow)
+  combined <- bind_rows(aov_list)
+
+  tbl <- kable(
+    combined,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    col.names = c("Term", "$df$", "SS", "MS", "$F$", "$p$", "$\\eta^2_p$")
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(1, width = "10em")
+
+  cur <- 1
+  for (i in seq_along(labels)) {
+    tbl <- pack_rows(tbl, labels[i], cur, cur + aov_n[i] - 1)
+    cur <- cur + aov_n[i]
+  }
+  tbl
+}
+
+# kable for EMMs, rows grouped by trait via pack_rows
+# spec: emmeans formula, e.g. ~ Treatment or ~ Treatment + Egg_Count
+# col.names: must match the columns returned by the chosen spec
+emm_table <- function(models, labels, spec, col.names) {
+  emm_list <- lapply(models, tidy_emm, spec = spec)
+  emm_n    <- sapply(emm_list, nrow)
+  combined <- bind_rows(emm_list)
+
+  tbl <- kable(
+    combined,
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    col.names = col.names
+  ) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(1, width = "6em")
+
+  cur <- 1
+  for (i in seq_along(labels)) {
+    tbl <- pack_rows(tbl, labels[i], cur, cur + emm_n[i] - 1)
+    cur <- cur + emm_n[i]
+  }
+  tbl
+}
+
+
+# -------------------------------------------------------------------------
+# Egg-count assay
+# -------------------------------------------------------------------------
+count_lm  <- lm(Total   ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
+countF_lm <- lm(F_total ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
+countM_lm <- lm(M_total ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
+
+anova_table(
+  models = list(count_lm, countF_lm, countM_lm),
+  labels = c("Total", "Female", "Male")
+)
+
+# ANOVA for Egg_Count as a response — tests whether egg production itself
+# varies by Mito, Nuc, and Treatment
+countE_lm <- lm(Egg_Count ~ Mito * Nuc * Treatment, data = egg_count)
+
+anova_table(
+  models = list(countE_lm),
+  labels = c("Egg Count")
+)
+
+emm_table(
+  models    = list(count_lm, countF_lm, countM_lm),
+  labels    = c("Total", "Female", "Male"),
+  spec      = ~ Treatment + Egg_Count,
+  col.names = c("Treatment", "Egg Count", "EMM", "SE", "$df$", "Lower CI", "Upper CI")
+)

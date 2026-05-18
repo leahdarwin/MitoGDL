@@ -1,39 +1,43 @@
 # MitoGDL 
-This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". The project is organized by trait, with each trait-specific folder containing raw data and scripts for processing. A separate `figures` folder contains the code required to reproduce all figures presented in the manuscript.  
+This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". Data and scripts are organised into top-level `data/` and `scripts/` folders, each subdivided by trait. A separate `figures/` folder holds the output figures.
 
 ---
 
 ## Repository Structure
 
 ```
-├── development/
-├── weight/
-├── climb/
-├── flight/
-│   ├── data/ # Raw data files for this trait
-│   ├── scripts/  # Data wrangling and adjustment scripts
-│   └── ...
+├── data/
+│   ├── climb/          # Raw and adjusted climbing assay data
+│   ├── development/    # Raw and adjusted development time data
+│   ├── flight/         # Raw and adjusted flight performance data
+│   ├── survival/       # Survival assay data
+│   ├── weight/         # Raw and adjusted weight data
+│   └── figures/        # Extra data for figures (phylogeny, CI chain SNPs, protein structure)
+│
+├── scripts/
+│   ├── climb/          # Wrangling and ANOVA scripts for climbing assay
+│   ├── development/    # Wrangling and ANOVA scripts for development time
+│   ├── flight/         # Wrangling and ANOVA scripts for flight performance
+│   ├── survival/       # ANOVA scripts for survival assay
+│   ├── weight/         # Wrangling and ANOVA scripts for weight
+│   └── figures/        # Scripts to reproduce all manuscript figures
 │
 ├── figures/
-│   ├── scripts/ # Scripts to reproduce all figures
-│   ├── main_figs/ # main manucript figures
-│   ├── ed_figs/ # extended data figures
-│   ├── supp_figs/ # supplemental data figures
-│   ├── extra_data/ # Extra data related to creation of figures but not data from the primary experiment 
-│   └── ...
+│   ├── main_figs/      # Main manuscript figures
+│   └── supp_figs/      # Supplemental figures
 │
 └── README.md
 ```
 
-- **Trait folders** (`development`, `weight`, `climb`, `flight`)  
-  Each folder contains:  
-  - **Raw trait data** (`data/`): Direct exports from experiments and adjusted data.  
-  - **Wrangling scripts** (`scripts/`): Code to clean and adjust data following procedures described in the manuscript.  
+- **`data/`**  
+  Contains all raw and processed data files, organised by trait. Each subfolder mirrors the trait structure used in the analysis scripts.  
+  Complex I AA changes are given in `data/figures/CI_chain_snps.tsv`.
 
-- **Figures folder**  
-  Contains all R scripts needed to reproduce the figures from the manuscript using the processed data.
+- **`scripts/`**  
+  Contains all analysis and figure scripts, organised by trait. All scripts use paths relative to the project root (open `MitoGDL.Rproj` in RStudio to set the working directory automatically).
 
-  Complex I AA changes are given in `/figures/extra_data/CI_chain_snps.tsv`.
+- **`figures/`**  
+  Output figures written by the scripts in `scripts/figures/`.
 
 ---
 
@@ -43,8 +47,8 @@ Most analyses were conducted in R (version 4.4.0). The required R packages are l
 
 1. Clone this repository.  
 2. Open the `.Rproj` file in RStudio.  
-3. Run the scripts in the trait folders to wrangle and adjust raw data.  
-4. Use the scripts in `figures/` to generate the figures in the manuscript.
+3. Run the scripts in `scripts/<trait>/` to wrangle and adjust raw data.  
+4. Use the scripts in `scripts/figures/` to generate the figures in the manuscript.
 
 Protein figures were made using Python (version 3.12.12) with pymol-open-source (version 3.1.0).
 

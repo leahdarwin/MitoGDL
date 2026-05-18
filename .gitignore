@@ -48,12 +48,16 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+# Data folder (download from data repo)
+data/
+
 # Test plot function not included in manuscript
-figures/scripts/surv_plot.R
+scripts/figures/surv_plot.R
 
 # batch scripts for compute cluster
 batch/
 
-##figure files for formatting
+# figure files for formatting
 figures/supp_figs/ixn_subsample.rds
-figures/scripts/export_ixn_subsample.R
+scripts/figures/export_ixn_subsample.R
+
