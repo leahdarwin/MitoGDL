@@ -23,7 +23,7 @@ lapply(packages, library, character.only = TRUE)
 ## ---------------------------------------------------------
 ## Load and prepare climbing dataset
 ## ---------------------------------------------------------
-climb <- read.csv("data/climb/climb_adj.csv") %>%
+climb <- read.csv("data/climb_adj.csv") %>%
   na.omit() %>%
   group_by(Mito, Nuc, Treatment, Sex, Build) %>%
   summarise(climb = mean(Y_adj), .groups = "drop") %>%

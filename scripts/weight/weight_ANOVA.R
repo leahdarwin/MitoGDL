@@ -29,7 +29,7 @@ options(contrasts = c("contr.sum", "contr.poly"))  # treatment contrasts for Typ
 ## ---------------------------------------------------------
 ## Load and preprocess phenotype data
 ## ---------------------------------------------------------
-weight <- read.csv("data/weight/weight_adj.csv") %>%
+weight <- read.csv("data/weight_adj.csv") %>%
   filter(!Mito %in% c("Ore", "375")) %>%  # remove unwanted mitochondrial lines
   mutate(Y_adj = Y_adj * 1000) # rescale phenotype
  

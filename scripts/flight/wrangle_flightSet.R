@@ -28,7 +28,7 @@ lapply(packages, library, character.only = TRUE)
 ## ---------------------------
 
 # Find all CSVs beginning with "flightSet"
-files <- list.files(path = "./flight/data/", pattern = "^flightSet.*csv$", full.names = TRUE)
+files <- list.files(path = "data/", pattern = "^flightSet.*csv$", full.names = TRUE)
 dfs   <- lapply(files, read.csv)
 
 # Genotype metadata (drop precomputed MitoNuc column, recode Build)
@@ -137,4 +137,4 @@ df <- bind_rows(dfs) %>%
 ## ---------------------------
 ## Write output
 ## ---------------------------
-write.csv(df, "data/flight/flight.csv", row.names = FALSE, quote = FALSE)
+write.csv(df, "data/flight.csv", row.names = FALSE, quote = FALSE)

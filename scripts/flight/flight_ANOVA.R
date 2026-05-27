@@ -28,7 +28,7 @@ lapply(packages, library, character.only = TRUE)
 # -------------------------------------------------------------------------
 # - Remove parental mito lines ("375", "Ore")
 # - Average adjusted phenotype (Y_adj) across replicates
-flight = read.csv("data/flight/flight_adj.csv") %>%
+flight = read.csv("data/flight_adj.csv") %>%
   filter(!Mito %in% c("375", "Ore")) %>%
   group_by(Mito, Nuc, Sex, Build, Treatment) %>%
   summarise(Y_adj = mean(Y_adj), .groups = "drop")

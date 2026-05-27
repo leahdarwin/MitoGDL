@@ -143,7 +143,7 @@ sex_colors <- c("F" = "#e7298a", "M" = "#1b9e77")
 
 # Load datasets -----------------------------------------------------------
 
-climb <- read.csv("data/climb/climb_adj.csv") %>%
+climb <- read.csv("data/climb_adj.csv") %>%
   na.omit() %>%
   group_by(Sex, Treatment, Nuc, Mito, Build) %>%
   summarise(Y_adj = mean(Y_adj), .groups = "drop_last") %>%
@@ -154,7 +154,7 @@ climb <- read.csv("data/climb/climb_adj.csv") %>%
          group_var = var(Y_adj),
          group_cv = group_var / group_mean)
 
-flight <- read.csv("data/flight/flight_adj.csv") %>%
+flight <- read.csv("data/flight_adj.csv") %>%
   na.omit() %>%
   group_by(Sex, Treatment, Nuc, Mito, Build) %>%
   summarise(Y_adj = mean(Y_adj), .groups = "drop_last") %>%
@@ -165,7 +165,7 @@ flight <- read.csv("data/flight/flight_adj.csv") %>%
          group_var = var(Y_adj),
          group_cv = group_var / group_mean)
 
-weight <- read.csv("data/weight/weight_adj.csv") %>%
+weight <- read.csv("data/weight_adj.csv") %>%
   na.omit() %>%
   mutate(Y_adj = Y_adj * 1000) %>%
   group_by(Sex, Treatment, Nuc, Mito, Build) %>%

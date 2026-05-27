@@ -23,14 +23,14 @@ lapply(packages, library, character.only = TRUE)
 # -------------------------------------------------------------------
 
 # Each CSV file contains adjusted phenotype data (Y_adj)
-climb  <- read.csv("data/climb/climb_adj.csv")
+climb  <- read.csv("data/climb_adj.csv")
 
 # Add a Sex column to development data (if not present)
-dev    <- read.csv("data/development/development_adj.csv") %>% 
+dev    <- read.csv("data/development_adj.csv") %>% 
   mutate(Sex = "MF")
 
-weight <- read.csv("data/weight/weight_adj.csv") %>% mutate(Y_adj = Y_adj*1000)
-flight <- read.csv("data/flight/flight_adj.csv") 
+weight <- read.csv("data/weight_adj.csv") %>% mutate(Y_adj = Y_adj*1000)
+flight <- read.csv("data/flight_adj.csv") 
 
 
 # -------------------------------------------------------------------

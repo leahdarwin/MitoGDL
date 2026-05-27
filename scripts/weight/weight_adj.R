@@ -23,7 +23,7 @@ lapply(packages, library, character.only = TRUE)
 ## ---------------------------------------------------------
 ## Load raw weight data
 ## ---------------------------------------------------------
-weight <- read.csv("data/weight/weight.csv", header = TRUE)
+weight <- read.csv("data/weight.csv", header = TRUE)
 
 ## ---------------------------------------------------------
 ## Count number of observations per group
@@ -83,4 +83,4 @@ weight_adj <- weight %>%
 ## ---------------------------------------------------------
 ## Save adjusted dataset
 ## ---------------------------------------------------------
-write.csv(weight_adj, "data/weight/weight_adj.csv", row.names = FALSE, quote = FALSE)
+write.csv(weight_adj, "data/weight_adj.csv", row.names = FALSE, quote = FALSE)

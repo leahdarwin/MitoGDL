@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 # Load required libraries (install if missing)
 # -------------------------------------------------------------------------
-packages <- c("dplyr", "broom", "emmeans", "knitr", "kableExtra", "effectsize")
+packages <- c("dplyr", "broom", "emmeans", "lme4", "lmerTest", "knitr", "kableExtra", "r2glmm", "performance")
 
 installed <- rownames(installed.packages())
 for (p in packages) {
@@ -18,24 +18,26 @@ for (p in packages) {
 }
 lapply(packages, library, character.only = TRUE)
 
+# Ensure Type III ANOVA with sum-to-zero contrasts
+options(contrasts = c("contr.sum", "contr.poly"))
+
 # -------------------------------------------------------------------------
 # Load data
 # -------------------------------------------------------------------------
-egg_count <- read.csv("data/survival/survival.csv") %>% mutate(Total = F_total + M_total)
+egg_count <- read.csv("data/survival.csv") %>% mutate(Total = F_total + M_total)
 
 # -------------------------------------------------------------------------
 # Helpers
 # -------------------------------------------------------------------------
 
-# Tidy ANOVA table (no residuals row) with partial eta-squared
+# Tidy ANOVA table from lmerTest model with R² effect sizes
 tidy_aov <- function(model) {
-  eta2 <- eta_squared(model, partial = TRUE) %>% select(Parameter, Eta2_partial)
+  r2 <- r2beta(model) %>% select(Effect, Rsq)
   tidy(anova(model)) %>%
-    filter(term != "Residuals") %>%
-    select(term, df, sumsq, meansq, statistic, p.value) %>%
-    left_join(eta2, by = join_by(term == Parameter)) %>%
+    select(term, sumsq, meansq, NumDF, statistic, p.value) %>%
+    left_join(r2, by = join_by(term == Effect)) %>%
     mutate(
-      across(c(sumsq, meansq, statistic, Eta2_partial), ~round(., 4)),
+      across(c(sumsq, meansq, statistic, Rsq), ~round(., 4)),
       p.value = format.pval(p.value, digits = 3, eps = 0.001)
     )
 }
@@ -58,7 +60,7 @@ anova_table <- function(models, labels) {
     booktabs  = TRUE,
     linesep   = "",
     escape    = FALSE,
-    col.names = c("Term", "$df$", "SS", "MS", "$F$", "$p$", "$\\eta^2_p$")
+    col.names = c("Term", "SS", "MS", "$df$", "$F$", "$p$", "$R^2$")
   ) %>%
     kable_styling(
       latex_options = c("hold_position"),
@@ -110,9 +112,9 @@ emm_table <- function(models, labels, spec, col.names) {
 # -------------------------------------------------------------------------
 # Egg-count assay
 # -------------------------------------------------------------------------
-count_lm  <- lm(Total   ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
-countF_lm <- lm(F_total ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
-countM_lm <- lm(M_total ~ Mito * Nuc * Treatment + Egg_Count, data = egg_count)
+count_lm  <- lmer(Total   ~ Nuc * Treatment + Egg_Count + (1|Nuc:Mito), data = egg_count)
+countF_lm <- lmer(F_total ~ Nuc * Treatment + Egg_Count + (1|Nuc:Mito), data = egg_count)
+countM_lm <- lmer(M_total ~ Nuc * Treatment + Egg_Count + (1|Nuc:Mito), data = egg_count)
 
 anova_table(
   models = list(count_lm, countF_lm, countM_lm),
@@ -121,7 +123,7 @@ anova_table(
 
 # ANOVA for Egg_Count as a response — tests whether egg production itself
 # varies by Mito, Nuc, and Treatment
-countE_lm <- lm(Egg_Count ~ Mito * Nuc * Treatment, data = egg_count)
+countE_lm <- lmer(Egg_Count ~  Nuc * Treatment + (1|Nuc:Mito), data = egg_count)
 
 anova_table(
   models = list(countE_lm),

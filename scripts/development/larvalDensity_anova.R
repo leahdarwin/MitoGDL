@@ -4,8 +4,8 @@ library(lme4)
 library(lmerTest)
 library(patchwork)
 
-dev = read.csv("data/development/development_adj.csv") 
-weight = read.csv("data/weight/weight_adj.csv")%>%
+dev = read.csv("data/development_adj.csv") 
+weight = read.csv("data/weight_adj.csv")%>%
   summarise(Y_adj = mean(Y_adj), .by=c(Mito,Nuc,Build,Set,Treatment,Sex))
 
 ld_lm <- lmerTest::lmer(

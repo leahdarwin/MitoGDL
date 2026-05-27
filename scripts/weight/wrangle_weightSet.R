@@ -29,7 +29,7 @@ stock_geno <- read.csv("stock_genotype.csv")
 ## - Matches files beginning with "weightSet"
 ## - Combine into a single dataframe
 ## ---------------------------------------------------------
-files <- list.files(path = "data/weight/", pattern = "^weightSet.*csv$", full.names = TRUE)
+files <- list.files(path = "data/", pattern = "^weightSet.*csv$", full.names = TRUE)
 dfs <- lapply(files, read.csv)
 weight_df <- bind_rows(dfs)
 
@@ -78,4 +78,4 @@ weight_df <- weight_df %>%
 ## ---------------------------------------------------------
 ## Save cleaned dataset
 ## ---------------------------------------------------------
-write.csv(weight_df, file = "data/weight/weight.csv", row.names = FALSE, quote = FALSE)
+write.csv(weight_df, file = "data/weight.csv", row.names = FALSE, quote = FALSE)

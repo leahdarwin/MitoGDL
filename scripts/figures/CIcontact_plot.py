@@ -11,14 +11,14 @@
 from pymol import cmd
 import pandas as pd
 
-cmd.load("../../data/figures/8B9Z.cif")
+cmd.load("../../data/8B9Z.cif")
 
 # ===== 1. Read TSV file =====
 # Example TSV structure:
 # chain_id   AA_POS   MITO
 # A          45       yak_mt
 # B          109      mito_hs
-tsv_file = "../../data/figures/CI_chain_snps.tsv"
+tsv_file = "../../data/CI_chain_snps.tsv"
 df = pd.read_csv(tsv_file, sep="\t")
 
 ##Select D.mel="BZ", D.sim="siI", or D.yak="yak" to highlight AA changes

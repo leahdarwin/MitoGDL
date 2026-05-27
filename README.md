@@ -1,18 +1,12 @@
 # MitoGDL 
-This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". Data and scripts are organised into top-level `data/` and `scripts/` folders, each subdivided by trait. A separate `figures/` folder holds the output figures.
+This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". Data and scripts are organised into top-level `data/` and `scripts/` folders, with scripts subdivided by trait. A separate `figures/` folder holds the output figures.
 
 ---
 
 ## Repository Structure
 
 ```
-├── data/
-│   ├── climb/          # Raw and adjusted climbing assay data
-│   ├── development/    # Raw and adjusted development time data
-│   ├── flight/         # Raw and adjusted flight performance data
-│   ├── survival/       # Survival assay data
-│   ├── weight/         # Raw and adjusted weight data
-│   └── figures/        # Extra data for figures (phylogeny, CI chain SNPs, protein structure)
+├── data/               # All raw and processed data files (flat)
 │
 ├── scripts/
 │   ├── climb/          # Wrangling and ANOVA scripts for climbing assay
@@ -30,8 +24,8 @@ This repository contains all data and scripts used for the analyses and figures 
 ```
 
 - **`data/`**  
-  Contains all raw and processed data files, organised by trait. Each subfolder mirrors the trait structure used in the analysis scripts.  
-  Complex I AA changes are given in `data/figures/CI_chain_snps.tsv`.
+  Contains all raw and processed data files in a single flat directory. This includes climbing, development, flight, survival, and weight data (raw set files, merged files, and adjusted files), as well as extra data for figures (phylogeny, CI chain SNPs, protein structure).  
+  Complex I AA changes are given in `data/CI_chain_snps.tsv`.
 
 - **`scripts/`**  
   Contains all analysis and figure scripts, organised by trait. All scripts use paths relative to the project root (open `MitoGDL.Rproj` in RStudio to set the working directory automatically).

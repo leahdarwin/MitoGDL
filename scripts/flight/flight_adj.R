@@ -22,7 +22,7 @@ lapply(packages, library, character.only = TRUE)
 # -----------------------------------------
 # Load flight data
 # -----------------------------------------
-flight = read.csv("data/flight/flight.csv", header = TRUE)
+flight = read.csv("data/flight.csv", header = TRUE)
 
 # -----------------------------------------
 # Get within-set correction term
@@ -71,5 +71,5 @@ plot_flight = flight_adj %>%
 # -------------------------------------------
 # Save outputs
 # -------------------------------------------
-write.csv(flight_adj, "data/flight/flight_adj.csv", row.names = FALSE, quote = FALSE)
+write.csv(flight_adj, "data/flight_adj.csv", row.names = FALSE, quote = FALSE)
 

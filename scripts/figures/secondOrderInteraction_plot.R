@@ -24,9 +24,9 @@ invisible(lapply(packages, library, character.only = TRUE))
 ## -------------------------------------------------------------------
 ## Load datasets
 ## -------------------------------------------------------------------
-weight = read.csv("data/weight/weight_adj.csv")
-climb  = read.csv("data/climb/climb_adj.csv") %>% filter(Build != "parental")
-dev    = read.csv("data/development/development_adj.csv") %>% filter(Build != "parental")
+weight = read.csv("data/weight_adj.csv")
+climb  = read.csv("data/climb_adj.csv") %>% filter(Build != "parental")
+dev    = read.csv("data/development_adj.csv") %>% filter(Build != "parental")
 
 ## -------------------------------------------------------------------
 ## Define consistent color palette

@@ -27,7 +27,7 @@ lapply(packages, library, character.only = TRUE)
 ## Load adjusted development dataset
 ## - Exclude unwanted mitochondrial backgrounds (375, Ore)
 ## ---------------------------------------------------------
-dev <- read.csv("data/development/development_adj.csv") %>%
+dev <- read.csv("data/development_adj.csv") %>%
   filter(!Mito %in% c("375", "Ore"))
 
 ## ---------------------------------------------------------

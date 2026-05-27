@@ -36,7 +36,7 @@ options(contrasts = c("contr.sum", "contr.poly"))
 ## ---------------------------
 ## Load data
 ## ---------------------------
-climb <- read.csv("data/climb/climb_adj.csv", header = TRUE) %>%
+climb <- read.csv("data/climb_adj.csv", header = TRUE) %>%
   filter(!Mito %in% c("375", "Ore")) %>%   # Remove unwanted mito haplotypes
   mutate(
     across(c(Mito, Treatment, Nuc, Sex, Build, Vial), as.factor)

@@ -23,7 +23,7 @@ lapply(packages, library, character.only = TRUE)
 ## ---------------------------------------------------------
 ## Load development dataset
 ## ---------------------------------------------------------
-dev <- read.csv("data/development/development.csv") %>%
+dev <- read.csv("data/development.csv") %>%
   na.omit()  # remove missing values
 
 ## ---------------------------------------------------------
@@ -69,5 +69,5 @@ dev_adj <- dev %>%
 ## ---------------------------------------------------------
 ## Export adjusted dataset
 ## ---------------------------------------------------------
-write.csv(dev_adj, "data/development/development_adj.csv", row.names = FALSE, quote = FALSE)
+write.csv(dev_adj, "data/development_adj.csv", row.names = FALSE, quote = FALSE)
 

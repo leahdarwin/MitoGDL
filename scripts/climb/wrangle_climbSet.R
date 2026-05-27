@@ -24,7 +24,7 @@ invisible(lapply(required_packages, library, character.only = TRUE))
 #----------------------------------------------------------
 
 # Get all CSV files starting with "set" in the current directory
-files <- list.files(path = "data/climb/", pattern = "^set.*\\.csv$", full.names = TRUE)
+files <- list.files(path = "data/", pattern = "^set.*\\.csv$", full.names = TRUE)
 
 # Stock genotype reference file
 stock_geno <- read.csv("stock_genotype.csv") %>% 
@@ -123,4 +123,4 @@ climb_df <- climb_df %>%
 # 6. Save processed data
 #----------------------------------------------------------
 
-write.csv(climb_df, "data/climb/climb.csv", row.names = FALSE, quote = FALSE)
+write.csv(climb_df, "data/climb.csv", row.names = FALSE, quote = FALSE)

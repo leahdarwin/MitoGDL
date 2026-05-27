@@ -23,10 +23,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 ## -------------------------------------------------------------------
 ## Load datasets
 ## -------------------------------------------------------------------
-weight = read.csv("data/weight/weight_adj.csv") %>% filter(Build != "parental")
-climb  = read.csv("data/climb/climb_adj.csv") %>% filter(Build != "parental")
-dev    = read.csv("data/development/development_adj.csv") %>% filter(Build != "parental")
-flight = read.csv("data/flight/flight_adj.csv") %>% filter(Build != "parental")
+weight = read.csv("data/weight_adj.csv") %>% filter(Build != "parental")
+climb  = read.csv("data/climb_adj.csv") %>% filter(Build != "parental")
+dev    = read.csv("data/development_adj.csv") %>% filter(Build != "parental")
+flight = read.csv("data/flight_adj.csv") %>% filter(Build != "parental")
 
 # ===================================================================
 # Helper plotting functions

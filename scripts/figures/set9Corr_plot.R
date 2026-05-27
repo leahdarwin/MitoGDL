@@ -23,10 +23,10 @@ lapply(packages, library, character.only = TRUE)
 # -------------------------------------------------------------------
 # Load data
 # -------------------------------------------------------------------
-climb  <- read.csv("data/climb/climb_adj.csv") %>% rename(Y = Slope)
-dev    <- read.csv("data/development/development_adj.csv") %>% 
+climb  <- read.csv("data/climb_adj.csv") %>% rename(Y = Slope)
+dev    <- read.csv("data/development_adj.csv") %>% 
   mutate(Sex = "MF") %>% rename(Y = TSE)
-weight <- read.csv("data/weight/weight_adj.csv") %>% rename(Y = weight_per_fly)
+weight <- read.csv("data/weight_adj.csv") %>% rename(Y = weight_per_fly)
 
 # Stocks included in Set 9 (special unified experiment)
 stocks <- unique(climb$Stock[climb$Set == 9])

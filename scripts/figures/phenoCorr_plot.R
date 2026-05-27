@@ -24,10 +24,10 @@ lapply(packages, library, character.only = TRUE)
 # -------------------------------------------------------------------
 # Load datasets
 # -------------------------------------------------------------------
-weight <- read.csv("data/weight/weight.csv")
-climb  <- read.csv("data/climb/climb.csv")
-dev    <- read.csv("data/development/development.csv")
-flight <- read.csv("data/flight/flight.csv")
+weight <- read.csv("data/weight.csv")
+climb  <- read.csv("data/climb.csv")
+dev    <- read.csv("data/development.csv")
+flight <- read.csv("data/flight.csv")
 
 # -------------------------------------------------------------------
 # Helper function: summarize trait by group

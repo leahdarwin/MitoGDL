@@ -21,20 +21,20 @@ if (length(new_pkgs) > 0) {
 }
 invisible(lapply(packages, library, character.only = TRUE))
 
-weight = read.csv("data/weight/weight_adj.csv") %>%
+weight = read.csv("data/weight_adj.csv") %>%
   filter(!Mito %in% c("Ore", "375")) %>%  # remove parental lines
   mutate(Y_adj = Y_adj * 1000)%>%
   mutate(
     across(c(Mito, Treatment, Nuc, Sex, Build), as.factor)
   )
 
-climb <- read.csv("data/climb/climb_adj.csv", header = TRUE) %>%
+climb <- read.csv("data/climb_adj.csv", header = TRUE) %>%
   filter(!Mito %in% c("375", "Ore")) %>%
   mutate(
     across(c(Mito, Treatment, Nuc, Sex, Build, Vial), as.factor)
   )
 
-dev <- read.csv("data/development/development_adj.csv") %>%
+dev <- read.csv("data/development_adj.csv") %>%
   filter(!Mito %in% c("375", "Ore")) %>%
   mutate(across(c(Mito, Treatment, Nuc, Build), as.factor))
 

@@ -37,7 +37,7 @@ lapply(c(cran_packages, bioc_packages), library, character.only = TRUE)
 #-----------------------------------------------------------
 # Load phylogeny 
 #-----------------------------------------------------------
-mttree <- read.tree("data/figures/GDL_mts_SR_all.raxml.bestTree")
+mttree <- read.tree("data/GDL_mts_SR_all.raxml.bestTree")
 
 #-----------------------------------------------------------
 # Define function: calculate Blomberg’s K for a given condition
@@ -68,7 +68,7 @@ get_k_sig <- function(condition, df) {
 #-----------------------------------------------------------
 
 ## Climb
-climb <- read.csv("data/climb/climb_adj.csv") %>%
+climb <- read.csv("data/climb_adj.csv") %>%
   group_by(Mito, Nuc, Treatment, Sex) %>%
   na.omit() %>%
   summarise(Y = mean(Y_adj),
@@ -79,7 +79,7 @@ climb <- read.csv("data/climb/climb_adj.csv") %>%
   ))
 
 ## Flight
-flight <- read.csv("data/flight/flight_adj.csv") %>%
+flight <- read.csv("data/flight_adj.csv") %>%
   group_by(Mito, Nuc, Treatment, Sex) %>%
   na.omit() %>%
   summarise(Y = mean(Y_adj),
@@ -90,7 +90,7 @@ flight <- read.csv("data/flight/flight_adj.csv") %>%
   ))
 
 ## Development
-dev <- read.csv("data/development/development_adj.csv") %>%
+dev <- read.csv("data/development_adj.csv") %>%
   group_by(Mito, Nuc, Treatment) %>%
   na.omit() %>%
   summarise(Y = mean(Y_adj),
@@ -102,7 +102,7 @@ dev <- read.csv("data/development/development_adj.csv") %>%
   ))
 
 ## Weight
-weight <- read.csv("data/weight/weight_adj.csv") %>%
+weight <- read.csv("data/weight_adj.csv") %>%
   group_by(Mito, Nuc, Treatment, Sex) %>%
   na.omit() %>%
   summarise(Y = mean(Y_adj*1000),
