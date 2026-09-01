@@ -19,6 +19,7 @@ if (length(new_pkgs) > 0) {
   install.packages(new_pkgs, dependencies = TRUE)
 }
 invisible(lapply(packages, library, character.only = TRUE))
+source("scripts/figures/sourceData_helpers.R")
 
 ## -------------------------------------------------------------------
 ## Load datasets
@@ -57,17 +58,22 @@ color_palette = c(
 ## ---------------------------------------------------------------
 ## Plot treatment means (raw data + model-adjusted EMMs)
 ## ---------------------------------------------------------------
-plot_treatment_means = function(df, lm) {
-  
+plot_treatment_means = function(df, lm, panel_name = NULL) {
+
   # Get estimated marginal means for Treatment
   emm_df = as.data.frame(emmeans(lm, ~ Treatment))
-  
+
   # Summarize observed means (for raw data visualization)
   plot_df = df %>%
     group_by(Mito, Nuc, Treatment, Build) %>%
     summarise(Y_avg = mean(Y_adj), .groups = "drop") %>%
     na.omit()
-  
+
+  if (!is.null(panel_name)) {
+    save_source_data(plot_df, paste0("fig2_", panel_name, "_raw"), "main_figs")
+    save_source_data(emm_df,  paste0("fig2_", panel_name, "_emm"), "main_figs")
+  }
+
   # Plot: raw jittered points + model means with SE
   ggplot(plot_df, aes(x = Treatment, y = Y_avg, color = Treatment)) +
     geom_jitter(
@@ -89,17 +95,22 @@ plot_treatment_means = function(df, lm) {
 ## ---------------------------------------------------------------
 ## Plot nuclear background means (raw data + model-adjusted EMMs)
 ## ---------------------------------------------------------------
-plot_nuc_means = function(df, lm) {
-  
+plot_nuc_means = function(df, lm, panel_name = NULL) {
+
   # Get estimated marginal means for Nuclear background
   emm_df = as.data.frame(emmeans(lm, ~ Nuc))
-  
+
   # Summarize observed means (for raw data visualization)
   plot_df = df %>%
     group_by(Mito, Nuc, Treatment, Build) %>%
     summarise(Y_avg = mean(Y_adj), .groups = "drop")%>%
     na.omit()
-  
+
+  if (!is.null(panel_name)) {
+    save_source_data(plot_df, paste0("fig2_", panel_name, "_raw"), "main_figs")
+    save_source_data(emm_df,  paste0("fig2_", panel_name, "_emm"), "main_figs")
+  }
+
   # Plot: raw jittered points + model means with SE
   ggplot(plot_df, aes(x = Nuc, y = Y_avg, color = Nuc)) +
     geom_jitter(
@@ -120,22 +131,27 @@ plot_nuc_means = function(df, lm) {
 ## ---------------------------------------------------------------
 ## Plot mito means (raw data + model-adjusted EMMs)
 ## ---------------------------------------------------------------
-plot_mito_means = function(df, lm) {
-  
+plot_mito_means = function(df, lm, panel_name = NULL) {
+
   # Get estimated marginal means for Treatment
-  emm_df = as.data.frame(emmeans(lm, ~ Mito)) %>% 
+  emm_df = as.data.frame(emmeans(lm, ~ Mito)) %>%
     mutate(mitoOrig = map_mito_origin(Mito)) %>%
     arrange(emmean) %>%
     mutate(Mito = factor(Mito, levels = unique(Mito)))
-  
+
   # Summarize observed means (for raw data visualization)
   plot_df = df %>%
     group_by(Mito, Nuc, Treatment, Build) %>%
-    summarise(Y_avg = mean(Y_adj), .groups = "drop") %>% 
+    summarise(Y_avg = mean(Y_adj), .groups = "drop") %>%
     mutate(mitoOrig = map_mito_origin(Mito))  %>%
     mutate(Mito = factor(Mito, levels = levels(emm_df$Mito))) %>%
     na.omit()
-  
+
+  if (!is.null(panel_name)) {
+    save_source_data(plot_df, paste0("fig2_", panel_name, "_raw"), "main_figs")
+    save_source_data(emm_df,  paste0("fig2_", panel_name, "_emm"), "main_figs")
+  }
+
   # Plot: raw jittered points + model means with SE
   ggplot(plot_df, aes(x = Mito, y = Y_avg, color = mitoOrig)) +
     geom_jitter(
@@ -171,10 +187,10 @@ weightF_lm = lmer(
   data = weightF
 )
 
-weightF_plot_nuc = plot_nuc_means(weightF, weightF_lm) +
+weightF_plot_nuc = plot_nuc_means(weightF, weightF_lm, "weightF_nuc") +
   labs(y = "Weight (mg)")
 
-weightF_plot_mt = plot_mito_means(weightF, weightF_lm) +
+weightF_plot_mt = plot_mito_means(weightF, weightF_lm, "weightF_mito") +
   labs(y = "Weight (mg)")
 
 ## --------------------------
@@ -189,10 +205,10 @@ weightM_lm = lmer(
   data = weightM
 )
 
-weightM_plot_nuc = plot_nuc_means(weightM, weightM_lm) +
+weightM_plot_nuc = plot_nuc_means(weightM, weightM_lm, "weightM_nuc") +
   labs(y = "Weight (mg)")
 
-weightM_plot_mt = plot_mito_means(weightM, weightM_lm) +
+weightM_plot_mt = plot_mito_means(weightM, weightM_lm, "weightM_mito") +
   labs(y = "Weight (mg)")
 
 ## --------------------------
@@ -207,10 +223,10 @@ climbM_lm = lmer(
   data = climbM
 )
 
-climbM_plot_treat = plot_treatment_means(climbM, climbM_lm) +
+climbM_plot_treat = plot_treatment_means(climbM, climbM_lm, "climbM_treat") +
   labs(y = "Climbing \nspeed (cm/s)")
 
-climbM_plot_nuc = plot_nuc_means(climbM, climbM_lm) +
+climbM_plot_nuc = plot_nuc_means(climbM, climbM_lm, "climbM_nuc") +
   labs(y = "Climbing \nspeed (cm/s)")
 
 
@@ -226,14 +242,14 @@ climbF_lm = lmer(
   data = climbF
 )
 
-climbF_plot_treat = plot_treatment_means(climbF, climbF_lm) +
+climbF_plot_treat = plot_treatment_means(climbF, climbF_lm, "climbF_treat") +
   labs(y = "Climbing \nspeed (cm/s)")
 
-climbF_plot_nuc = plot_nuc_means(climbF, climbF_lm) +
+climbF_plot_nuc = plot_nuc_means(climbF, climbF_lm, "climbF_nuc") +
   labs(y = "Climbing \nspeed (cm/s)")
 
-climbF_plot_mt = plot_mito_means(climbF, climbF_lm) +
-  labs(y = "Climbing \nspeed (cm/s)") 
+climbF_plot_mt = plot_mito_means(climbF, climbF_lm, "climbF_mito") +
+  labs(y = "Climbing \nspeed (cm/s)")
 
 ## --------------------------
 ## Flight (Males)
@@ -245,10 +261,10 @@ flightM_lm = lmer(
   data = flightM
 )
 
-flightM_plot_treat = plot_treatment_means(flightM, flightM_lm) +
+flightM_plot_treat = plot_treatment_means(flightM, flightM_lm, "flightM_treat") +
   labs(y = "Flight landing \nheight (m)")
 
-flightM_plot_nuc = plot_nuc_means(flightM, flightM_lm) +
+flightM_plot_nuc = plot_nuc_means(flightM, flightM_lm, "flightM_nuc") +
   labs(y = "Flight landing \nheight (m)")
 
 
@@ -262,7 +278,7 @@ flightF_lm = lmer(
   data = flightF
 )
 
-flightF_plot_nuc = plot_nuc_means(flightF, flightF_lm) +
+flightF_plot_nuc = plot_nuc_means(flightF, flightF_lm, "flightF_nuc") +
   labs(y = "Flight landing \nheight (m)")
 
 
@@ -274,10 +290,10 @@ dev_lm = lmerTest::lmer(
   data = dev
 )
 
-dev_plot_treat = plot_treatment_means(dev, dev_lm) +
+dev_plot_treat = plot_treatment_means(dev, dev_lm, "dev_treat") +
   labs(y = "Development \ntime (days)")
 
-dev_plot_nuc = plot_nuc_means(dev, dev_lm) +
+dev_plot_nuc = plot_nuc_means(dev, dev_lm, "dev_nuc") +
   labs(y = "Development \ntime (days)")
 
 

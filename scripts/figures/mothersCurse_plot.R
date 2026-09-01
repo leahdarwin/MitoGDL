@@ -20,6 +20,7 @@ for (p in packages) {
   }
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 set.seed(99)
 
@@ -52,15 +53,28 @@ get_var_df <- function(df) {
     select(Nuc, Treatment, F_stat, F_lower, F_upper, p_value)
 }
 
+# box_stats() (five-number summary matching geom_boxplot()) is defined in
+# sourceData_helpers.R, sourced above, and shared with ixn_stability.R.
+
 # Make bootstrapped CV plot
 make_cv_plot <- function(df, trait) {
-  boot_climb <- df %>% 
+  boot_climb <- df %>%
     group_by(Mito, Nuc, Sex, Treatment) %>%
     summarise(Y_adj = mean(Y_adj), .groups = "drop_last") %>%
     group_by(Sex, Nuc, Treatment) %>%
     summarise(boot = list(boot_cv(Y_adj)), .groups = "drop") %>%
     tidyr::unnest(boot)
-  
+
+  trait_tag <- c("Climbing Velocity" = "climb", "Weight" = "weight", "Flight Performance" = "flight")[trait]
+  save_source_data(boot_climb, paste0("Sfig1_", trait_tag), "supp_figs")
+
+  # Box-plot summary stats (median, Q1/Q3, whiskers) for the same
+  # Sex x Nuc x Treatment groups shown as boxes in the plot
+  box_summary <- boot_climb %>%
+    group_by(Sex, Nuc, Treatment) %>%
+    summarise(box_stats(boot), .groups = "drop")
+  save_source_data(box_summary, paste0("Sfig1_", trait_tag, "_box"), "supp_figs")
+
   ggplot(boot_climb, aes(
     y = boot,
     x = interaction(Nuc, Treatment, sep = "\n"),
@@ -235,6 +249,8 @@ colnames(weak_tab) <- colnames(strong_tab) <- c("Trait", "Nuc", "Treatment", "st
 
 mch_tab <- rbind(weak_tab, strong_tab)
 n_weak  <- nrow(weak_tab)
+
+save_source_data(mch_tab, "mothersCurse_mch_table", "supp_figs")
 
 mch_tab %>%
   kable(

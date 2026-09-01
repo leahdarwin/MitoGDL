@@ -19,6 +19,7 @@ for (p in packages) {
   }
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 # -------------------------------------------------------------------
 # Load data
@@ -156,7 +157,7 @@ get_corr <- function(merged, trait) {
       column_spec(1, width = "6em")
   )
 
-  return(p)
+  list(plot = p, corr_tab = corr_tab)
 }
 
 # -------------------------------------------------------------------
@@ -166,9 +167,19 @@ merged_climb  <- get_merged_df(climb)
 merged_weight <- get_merged_df(weight)
 merged_dev    <- get_merged_df(dev)
 
-p1 <- get_corr(merged_climb,  "Climbing")
-p2 <- get_corr(merged_weight, "Weight")
-p3 <- get_corr(merged_dev,    "Development")
+save_source_data(merged_climb,  "set9Corr_figS4_climb",  "supp_figs")
+save_source_data(merged_weight, "set9Corr_figS4_weight", "supp_figs")
+save_source_data(merged_dev,    "set9Corr_figS4_dev",    "supp_figs")
+
+res1 <- get_corr(merged_climb,  "Climbing")
+res2 <- get_corr(merged_weight, "Weight")
+res3 <- get_corr(merged_dev,    "Development")
+p1 <- res1$plot
+p2 <- res2$plot
+p3 <- res3$plot
+
+save_source_data(rbind(res1$corr_tab, res2$corr_tab, res3$corr_tab),
+                  "set9Corr_corr_table", "supp_figs")
 
 # Combine into a single figure
 combined_plot <- p3 + p1 + theme(legend.position = "none") + p2

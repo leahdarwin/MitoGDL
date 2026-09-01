@@ -18,6 +18,7 @@ for (p in packages) {
   if (!(p %in% installed)) install.packages(p, dependencies = TRUE)
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 # -------------------------------------------------------------------
 # Load data
@@ -92,6 +93,9 @@ merged <- full_join(dev_MF,
 # -------------------------------------------------------------------
 # Overall PCA
 pca <- prcomp(merged[, 4:10], scale. = TRUE)
+
+save_source_data(merged, "phenoPCA_figS3_traits", "supp_figs")
+save_source_data(cbind(merged[, 1:3], as.data.frame(pca$x)), "phenoPCA_figS3_scores", "supp_figs")
 
 # -------------------------------------------------------------------
 # Plot PCA

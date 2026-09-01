@@ -20,6 +20,7 @@ if (length(new_pkgs) > 0) {
   install.packages(new_pkgs, dependencies = TRUE)
 }
 invisible(lapply(packages, library, character.only = TRUE))
+source("scripts/figures/sourceData_helpers.R")
 
 weight = read.csv("data/weight_adj.csv") %>%
   filter(!Mito %in% c("Ore", "375")) %>%  # remove parental lines
@@ -140,8 +141,13 @@ subsample_mito_ixn <- function(df, n_mito = 10, n_draws = 200, seed = 42,
 # Within each term, four violins (one per n_mito level) are shown side by side
 # using a nested x-axis so distributions across subsampling depths are visible.
 # A dashed line marks the alpha threshold.
+#
+# Returns list(plot = <ggplot>, box_stats = <data.frame>). box_stats holds the
+# per-(term, n_mito) five-number summary of the boxplot actually drawn inside
+# each violin (computed on -log10(p_value), the plotted scale, not raw p),
+# plus the significant-draw proportion shown as a text label above each box.
 plot_ixn_stability <- function(sub_res_list, n_mito_vals, alpha = 0.05/4,
-                               title = "Interaction stability") {
+                               title = "Interaction stability", save_name = NULL) {
   # Combine results across n_mito settings, tagging each with its n_mito value
   combined <- mapply(function(res, nm) {
     if (is.null(res) || !is.data.frame(res) || nrow(res) == 0) return(NULL)
@@ -153,15 +159,26 @@ plot_ixn_stability <- function(sub_res_list, n_mito_vals, alpha = 0.05/4,
   ixn <- combined[grepl(":", combined$term), ]
   ixn$n_mito_label <- factor(paste0("k = ", ixn$n_mito),
                               levels = paste0("k = ", sort(unique(ixn$n_mito))))
+  ixn$neglog10_p <- -log10(ixn$p_value)
 
   # Proportion of draws where each term is significant, per n_mito level
   sig_prop <- ixn %>%
     group_by(term, n_mito_label) %>%
     summarise(prop_sig = mean(p_value < alpha), .groups = "drop") %>%
     mutate(label = as.character(round(prop_sig, 2)),
-           y     = max(-log10(ixn$p_value), na.rm = TRUE) * 1.02)
+           y     = max(ixn$neglog10_p, na.rm = TRUE) * 1.02)
 
-  ggplot(ixn, aes(x = n_mito_label, y = -log10(p_value), fill = n_mito_label)) +
+  # Box-plot summary stats on the plotted scale (-log10 p), matching what
+  # geom_boxplot() draws inside each violin, joined with the significant-draw
+  # proportion shown as the text label above each box.
+  box_summary <- ixn %>%
+    group_by(term, n_mito_label) %>%
+    summarise(box_stats(neglog10_p), .groups = "drop") %>%
+    left_join(sig_prop %>% select(term, n_mito_label, prop_sig),
+              by = c("term", "n_mito_label")) %>%
+    mutate(dataset = save_name, .before = 1)
+
+  ggplot(ixn, aes(x = n_mito_label, y = neglog10_p, fill = n_mito_label)) +
     geom_violin(alpha = 0.55, color = NA) +
     geom_boxplot(width = 0.15, outlier.size = 0.7, fill = "white", color = "grey30") +
     geom_hline(yintercept = -log10(alpha), linetype = "dashed",
@@ -177,7 +194,9 @@ plot_ixn_stability <- function(sub_res_list, n_mito_vals, alpha = 0.05/4,
       strip.placement  = "outside",
       strip.background = element_blank(),
       strip.text       = element_text(size = 9, color = "black")
-    )
+    ) -> p
+
+  list(plot = p, box_stats = box_summary)
 }
 
 n_mito_vals <- c(5, 10, 15, 20)
@@ -202,11 +221,20 @@ sub_res_weightM <- run_subsamples(weightM, use_vial_re = FALSE)
 sub_res_dev     <- run_subsamples(dev,     use_vial_re = FALSE,
                                   covariates = "Larval_density")
 
-p1 <- plot_ixn_stability(sub_res_climbF,  n_mito_vals, title = "Female Climbing")
-p2 <- plot_ixn_stability(sub_res_climbM,  n_mito_vals, title = "Male Climbing")
-p3 <- plot_ixn_stability(sub_res_weightF, n_mito_vals, title = "Female Weight")
-p4 <- plot_ixn_stability(sub_res_weightM, n_mito_vals, title = "Male Weight")
-p5 <- plot_ixn_stability(sub_res_dev,     n_mito_vals, title = "Development Time")
+res1 <- plot_ixn_stability(sub_res_climbF,  n_mito_vals, title = "Female Climbing", save_name = "climbF")
+res2 <- plot_ixn_stability(sub_res_climbM,  n_mito_vals, title = "Male Climbing", save_name = "climbM")
+res3 <- plot_ixn_stability(sub_res_weightF, n_mito_vals, title = "Female Weight", save_name = "weightF")
+res4 <- plot_ixn_stability(sub_res_weightM, n_mito_vals, title = "Male Weight", save_name = "weightM")
+res5 <- plot_ixn_stability(sub_res_dev,     n_mito_vals, title = "Development Time", save_name = "dev")
+
+p1 <- res1$plot; p2 <- res2$plot; p3 <- res3$plot; p4 <- res4$plot; p5 <- res5$plot
+
+# Single combined source-data table (box-plot stats for every panel/trait),
+# rather than one file per trait
+save_source_data(
+  rbind(res1$box_stats, res2$box_stats, res3$box_stats, res4$box_stats, res5$box_stats),
+  "ixn_subsample_box", "supp_figs"
+)
 
 final <- ((p1 + p2 + p3) / (p4 + p5 + plot_spacer())) + plot_layout(guides="collect", axis_titles="collect")
 saveRDS(final, "figures/supp_figs/ixn_subsample.rds")

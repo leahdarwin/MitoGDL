@@ -17,6 +17,7 @@ for (p in packages) {
   }
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 # -------------------------------------------------------------------
 # Load and preprocess input data for each trait
@@ -52,7 +53,10 @@ make_plot <- function(df, pheno) {
     full_join(df_p %>% filter(Build == "B"),
               by = join_by(Mito, Nuc, Sex, Treatment)) %>%
     na.omit()  # Remove incomplete pairs (only A or only B)
-  
+
+  # Export source data (Build A vs Build B means feeding the scatterplot)
+  save_source_data(build, paste0("buildCorr_figS1_", tolower(pheno)), "supp_figs")
+
   # Compute correlation between Build A and Build B
   ct <- cor.test(build$Y_adj.x, build$Y_adj.y)
   

@@ -31,11 +31,11 @@ for (p in bioc_packages) {
 }
 
 lapply(c(cran_packages, bioc_packages), library, character.only = TRUE)
-
+source("scripts/figures/sourceData_helpers.R")
 
 
 #-----------------------------------------------------------
-# Load phylogeny 
+# Load phylogeny
 #-----------------------------------------------------------
 mttree <- read.tree("data/GDL_mts_SR_all.raxml.bestTree")
 
@@ -112,6 +112,11 @@ weight <- read.csv("data/weight_adj.csv") %>%
     .default = Mito
   ))
 
+save_source_data(climb,  "phyloSignal_Sfig2_climb",  "supp_figs")
+save_source_data(flight, "phyloSignal_Sfig2_flight", "supp_figs")
+save_source_data(dev,    "phyloSignal_Sfig2_dev",    "supp_figs")
+save_source_data(weight, "phyloSignal_Sfig2_weight", "supp_figs")
+
 #-----------------------------------------------------------
 # Generate condition grids
 #-----------------------------------------------------------
@@ -159,6 +164,8 @@ k_tab <- rbind(
   extract_k(Kdev,    cond_dev,   "Development"),
   extract_k(Kweight, conditions, "Weight")
 )
+
+save_source_data(k_tab, "phyloSignal_ktab", "supp_figs")
 
 print(
   kable(k_tab,

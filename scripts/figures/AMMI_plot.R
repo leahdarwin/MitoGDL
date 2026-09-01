@@ -19,6 +19,7 @@ for (p in packages) {
   }
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 ## ---------------------------------------------------------
 ## Load and prepare climbing dataset
@@ -69,7 +70,11 @@ make_plot <- function(df, name) {
   
   # Subset genotypes only for coloring
   mdf_gen <- mdf %>% filter(type == "GEN")
-  
+
+  # Export source data (full biplot coords: GEN + ENV rows)
+  suffix <- ifelse(grepl("Female", name), "F", "M")
+  save_source_data(mdf, paste0("AMMI_fig4_", suffix), "main_figs")
+
   # Build the biplot
   ggplot(mdf_gen, aes(x = PC1, y = PC2, color = mitoOrig)) +
     geom_point(size = 2) +

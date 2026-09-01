@@ -82,7 +82,7 @@ for _, row in df.iterrows():
         cmd.show("spheres", res_sel)
         cmd.color(color, res_sel)
         cmd.set("sphere_scale", 1.5, res_sel)
-        
+
         with open("residue_log_" + option + ".txt", "a") as f:
                     f.write(f"{pos},{chain},{overlap}\n")
 

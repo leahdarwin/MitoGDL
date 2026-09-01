@@ -19,6 +19,7 @@ for (p in packages) {
   }
 }
 lapply(packages, library, character.only = TRUE)
+source("scripts/figures/sourceData_helpers.R")
 
 
 # -------------------------------------------------------------------
@@ -84,6 +85,9 @@ standardize_mito <- function(df) {
 
 merged_F <- standardize_mito(merged_F)
 merged_M <- standardize_mito(merged_M)
+
+save_source_data(merged_F, "phenoCorr_figS2_F", "supp_figs")
+save_source_data(merged_M, "phenoCorr_figS2_M", "supp_figs")
 
 # -------------------------------------------------------------------
 # Phenotype combinations
@@ -171,15 +175,21 @@ run_corr_tests <- function(combs, merged_df) {
       column_spec(2, width = "10em")
   )
 
-  # Return plots for external assembly
-  lapply(combs, make_plot, merged_df)
+  # Return plots + correlation table for external assembly/export
+  list(plots = lapply(combs, make_plot, merged_df), corr_tab = corr_tab)
 }
 
 # -------------------------------------------------------------------
 # Run for Females and Males
 # -------------------------------------------------------------------
-plots_F <- run_corr_tests(combs_F, merged_F)
-plots_M <- run_corr_tests(combs_M, merged_M)
+res_F <- run_corr_tests(combs_F, merged_F)
+res_M <- run_corr_tests(combs_M, merged_M)
+plots_F <- res_F$plots
+plots_M <- res_M$plots
+
+save_source_data(rbind(res_F$corr_tab %>% mutate(Sex = "F"),
+                        res_M$corr_tab %>% mutate(Sex = "M")),
+                  "phenoCorr_corr_table", "supp_figs")
 
 # -------------------------------------------------------------------
 # Assemble into a single figure using patchwork

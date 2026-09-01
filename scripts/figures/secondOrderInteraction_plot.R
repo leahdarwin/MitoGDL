@@ -20,6 +20,7 @@ if (length(new_pkgs) > 0) {
   install.packages(new_pkgs, dependencies = TRUE)
 }
 invisible(lapply(packages, library, character.only = TRUE))
+source("scripts/figures/sourceData_helpers.R")
 
 ## -------------------------------------------------------------------
 ## Load datasets
@@ -113,6 +114,7 @@ weightM_lm = lmer(
 
 emm_mito_weight = emmeans(weightM_lm, ~ Nuc | Mito)
 weight_dfs = get_dfs(emm_mito_weight)
+save_source_data(weight_dfs$emmeans, "secondOrderIxn_fig3_weightM", "main_figs")
 
 weight_contrast_plot = plot_contrast(weight_dfs$contrasts)
 weight_ixn_plot = plot_ixn_mtnuc(weight_dfs$emmeans) +
@@ -135,6 +137,7 @@ dev_lm = lmerTest::lmer(
 
 emm_mito_dev = emmeans(dev_lm, ~ Treatment | Mito)
 dev_dfs = get_dfs(emm_mito_dev)
+save_source_data(dev_dfs$emmeans, "secondOrderIxn_fig3_dev", "main_figs")
 
 dev_contrast_plot = plot_contrast(dev_dfs$contrasts)
 dev_ixn_plot = plot_ixn_mttreat(dev_dfs$emmeans) +
@@ -159,6 +162,7 @@ climbM_lm = lmer(
 
 emm_mito_climbM = emmeans(climbM_lm, ~ Treatment | Mito)
 climbM_dfs = get_dfs(emm_mito_climbM)
+save_source_data(climbM_dfs$emmeans, "secondOrderIxn_fig3_climbM", "main_figs")
 
 climbM_contrast_plot = plot_contrast(climbM_dfs$contrasts)
 climbM_ixn_plot = plot_ixn_mttreat(climbM_dfs$emmeans) +
@@ -175,6 +179,7 @@ climbF_lm = lmer(
 
 emm_mito_climbF = emmeans(climbF_lm, ~ Treatment | Mito)
 climbF_dfs = get_dfs(emm_mito_climbF)
+save_source_data(climbF_dfs$emmeans, "secondOrderIxn_fig3_climbF", "main_figs")
 
 climbF_contrast_plot = plot_contrast(climbF_dfs$contrasts)
 climbF_ixn_plot = plot_ixn_mttreat(climbF_dfs$emmeans) +
