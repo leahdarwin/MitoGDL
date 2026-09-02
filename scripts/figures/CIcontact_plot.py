@@ -13,6 +13,17 @@ import pandas as pd
 
 cmd.load("../../data/8B9Z.cif")
 
+# ===== Colorblind-safe palette =====
+# Named PyMOL colors ("green"/"tv_yellow"/plain "green" highlight) are
+# replaced with explicit hex values so the figure stays distinguishable
+# under deuteranopia/protanopia/tritanopia, per journal color policy:
+# mt_chain/nuc_chain use the "blue and yellow" pairing (robust across all
+# three CVD types), and the highlight spheres use "red and turquoise"
+# instead of red/green.
+cmd.set_color("mt_blue",      [0x00 / 255, 0x72 / 255, 0xB2 / 255])  # Okabe-Ito blue
+cmd.set_color("nuc_yellow",   [0xF0 / 255, 0xE4 / 255, 0x42 / 255])  # Okabe-Ito yellow
+cmd.set_color("cvd_turquoise",[0x00 / 255, 0x9E / 255, 0x73 / 255])  # Okabe-Ito bluish green
+
 # ===== 1. Read TSV file =====
 # Example TSV structure:
 # chain_id   AA_POS   MITO
@@ -34,8 +45,8 @@ cmd.select("mt_chain", "chain " + "+".join(mt_chains))
 cmd.select("nuc_chain", "not mt_chain")
 
 # Color them
-cmd.color("green", "mt_chain")
-cmd.color("tv_yellow", "nuc_chain")
+cmd.color("mt_blue", "mt_chain")
+cmd.color("nuc_yellow", "nuc_chain")
 
 ##only show ribbon for Nuc proteins 
 cmd.show("cartoon", "nuc_chain")
@@ -71,12 +82,13 @@ for _, row in df.iterrows():
         # Check if this residue overlaps with contact sites
         overlap = cmd.count_atoms(f"{res_sel} and mt_if_atoms") > 0
 
-        # Decide color logic
+        # Decide color logic (red = overlap, turquoise = no overlap;
+        # colorblind-safe pair, replaces the previous red/green scheme)
         if overlap:
             color = "red"
             print(f"Residue {res_sel} in chain {chain} overlaps with mt_if_atoms")
         else:
-            color = "green"
+            color = "cvd_turquoise"
 
         # Apply color
         cmd.show("spheres", res_sel)
