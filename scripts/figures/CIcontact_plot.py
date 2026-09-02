@@ -11,7 +11,7 @@
 from pymol import cmd
 import pandas as pd
 
-cmd.load("../../data/8B9Z.cif")
+cmd.load("data/8B9Z.cif")
 
 # ===== Colorblind-safe palette =====
 # Named PyMOL colors ("green"/"tv_yellow"/plain "green" highlight) are
@@ -29,13 +29,14 @@ cmd.set_color("cvd_turquoise",[0x00 / 255, 0x9E / 255, 0x73 / 255])  # Okabe-Ito
 # chain_id   AA_POS   MITO
 # A          45       yak_mt
 # B          109      mito_hs
-tsv_file = "../../data/CI_chain_snps.tsv"
+tsv_file = "data/CI_chain_snps.tsv"
 df = pd.read_csv(tsv_file, sep="\t")
 
 ##Select D.mel="BZ", D.sim="siI", or D.yak="yak" to highlight AA changes
-#option="BZ"
+option="BZ"
 #option="yak"
-option="siI"
+#option="siI"
+
 
 # ===== 2. Get chain lists =====
 mt_chains = df["chain_id"].unique().tolist()
@@ -132,5 +133,5 @@ cmd.set("ambient_occlusion_mode", 2)
 
 
 # Ray trace and save PNG
-cmd.png("../main_figs/CIcontact_fig5_" + option + ".png", dpi=500, width=4000, height=4000, ray=1, quiet=0)
+cmd.png("figures/main_figs/CIcontact_fig5_" + option + ".png", dpi=500, width=4000, height=4000, ray=1, quiet=0)
 

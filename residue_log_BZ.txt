@@ -1,0 +1,8 @@
+148,N,False
+311,N,True
+84,M,True
+161,M,False
+368,M,False
+450,L,True
+486,L,True
+551,L,True
