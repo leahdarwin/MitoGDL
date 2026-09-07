@@ -79,6 +79,17 @@ spearman_ci <- function(rho, n, conf = 0.95) {
 }
 
 # -------------------------------------------------------------------
+# Format p-values for print: fixed 4 decimal places (0.0000-style) for
+# p >= 0.0001, switching to 2-significant-figure scientific notation for
+# smaller p that would otherwise just print as "0.0000".
+# -------------------------------------------------------------------
+format_p <- function(p, threshold = 1e-4) {
+  ifelse(p < threshold,
+         formatC(signif(p, 2), format = "e", digits = 1),
+         formatC(p, format = "f", digits = 4))
+}
+
+# -------------------------------------------------------------------
 # Function: Compute correlations and return a ggplot
 # -------------------------------------------------------------------
 get_corr <- function(merged, trait) {
@@ -98,6 +109,8 @@ get_corr <- function(merged, trait) {
       Trait    = trait,
       Sex      = c("F", "M"),
       rho      = c(testF$estimate, testM$estimate),
+      S        = c(testF$statistic, testM$statistic),
+      df       = c(nrow(mergedF) - 2, nrow(mergedM) - 2),
       ci_lower = c(ciF[1], ciM[1]),
       ci_upper = c(ciF[2], ciM[2]),
       p        = c(testF$p.value, testM$p.value)
@@ -110,8 +123,8 @@ get_corr <- function(merged, trait) {
       scale_color_manual(values = sex_colors) +
       labs(
         title = trait,
-        x = "Rank in Split Experiment",
-        y = "Rank in Unified Experiment"
+        x = "Rank in Unified Experiment",
+        y = "Rank in Split Experiment"
       ) +
       theme_minimal(base_size = 14)
 
@@ -124,6 +137,8 @@ get_corr <- function(merged, trait) {
       Trait    = trait,
       Sex      = "MF",
       rho      = testMF$estimate,
+      S        = testMF$statistic,
+      df       = nrow(merged) - 2,
       ci_lower = ciMF[1],
       ci_upper = ciMF[2],
       p        = testMF$p.value
@@ -135,20 +150,23 @@ get_corr <- function(merged, trait) {
       geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
       labs(
         title = trait,
-        x = "Rank in Split Experiment",
-        y = "Rank in Unified Experiment"
+        x = "Rank in Unified Experiment",
+        y = "Rank in Split Experiment"
       ) +
       theme_minimal(base_size = 14)
   }
 
   print(
-    kable(corr_tab,
+    # Format p for print only (corr_tab itself, exported as source data,
+    # keeps the exact numeric p-value); see format_p() above.
+    kable(corr_tab %>% mutate(p = format_p(p)),
           format    = "latex",
           booktabs  = TRUE,
           linesep   = "",
           escape    = FALSE,
-          digits    = rep(3, 6),
-          col.names = c("Trait", "Sex", "$\\rho$", "$\\rho_{lower}$", "$\\rho_{upper}$", "$p$")) %>%
+          digits    = c(3, 3, 3, 3, 0, 3, 3, 3),
+          col.names = c("Trait", "Sex", "$\\rho$", "$S$", "$df$",
+                        "$\\rho_{lower}$", "$\\rho_{upper}$", "$p$")) %>%
       kable_styling(
         latex_options = c("hold_position"),
         full_width    = FALSE,

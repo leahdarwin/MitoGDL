@@ -46,15 +46,26 @@ get_var_df <- function(df) {
     ) %>%
     mutate(
       F_stat  = sapply(var_test, \(x) x$statistic),
+      df1     = sapply(var_test, \(x) x$parameter[["num df"]]),
+      df2     = sapply(var_test, \(x) x$parameter[["denom df"]]),
       F_lower = sapply(var_ci,   \(x) x$conf.int[1]),
       F_upper = sapply(var_ci,   \(x) x$conf.int[2]),
       p_value = sapply(var_test, \(x) x$p.value)
     ) %>%
-    select(Nuc, Treatment, F_stat, F_lower, F_upper, p_value)
+    select(Nuc, Treatment, F_stat, df1, df2, F_lower, F_upper, p_value)
 }
 
 # box_stats() (five-number summary matching geom_boxplot()) is defined in
 # sourceData_helpers.R, sourced above, and shared with ixn_stability.R.
+
+# Format p-values for print: fixed 4 decimal places for p >= 0.0001,
+# switching to 2-significant-figure scientific notation below that (rather
+# than the 0.0000 that fixed-decimal formatting would otherwise show).
+format_p <- function(p, threshold = 1e-4) {
+  ifelse(p < threshold,
+         formatC(signif(p, 2), format = "e", digits = 1),
+         formatC(p, format = "f", digits = 4))
+}
 
 # Make bootstrapped CV plot
 make_cv_plot <- function(df, trait) {
@@ -145,6 +156,8 @@ get_corr_df = function(df){
     summarise( cor_test = list(cor.test(Y_adj.x, Y_adj.y, method = "pearson")), .groups = "drop" ) %>%
     mutate(
       r       = sapply(cor_test, \(x) x$estimate),
+      t_stat  = sapply(cor_test, \(x) x$statistic),  # test statistic (r itself is the effect size, not this)
+      df      = sapply(cor_test, \(x) x$parameter),  # n - 2
       r_lower = sapply(cor_test, \(x) x$conf.int[1]),
       r_upper = sapply(cor_test, \(x) x$conf.int[2]),
       p       = sapply(cor_test, \(x) x$p.value)
@@ -234,18 +247,29 @@ corvar <- corrdf %>%
     flight %>% select(Nuc, Treatment, Sex, group_var, group_cv) %>% distinct() %>% mutate(Trait = "flight")
   ), join_by(Nuc, Treatment, Trait)) %>%
   select(Trait, Nuc, Treatment, Sex, group_var,
-         F_stat, F_lower, F_upper, p_value,
-         r, r_lower, r_upper, p) %>%
+         F_stat, df1, df2, F_lower, F_upper, p_value,
+         r, t_stat, df, r_lower, r_upper, p) %>%
   tidyr::pivot_wider(names_from = Sex, values_from = group_var,
                      names_prefix = "Var_") %>%
   select(Trait, Nuc, Treatment, Var_F, Var_M,
-         F_stat, F_lower, F_upper, p_value,
-         r, r_lower, r_upper, p)
+         F_stat, df1, df2, F_lower, F_upper, p_value,
+         r, t_stat, df, r_lower, r_upper, p)
 
-# Table output: Weak MCH (F) stacked above Strong MCH (r) as two labelled sections
-weak_tab   <- corvar %>% select(Trait, Nuc, Treatment, F_stat, F_lower, F_upper, p_value)
-strong_tab <- corvar %>% select(Trait, Nuc, Treatment, r, r_lower, r_upper, p)
-colnames(weak_tab) <- colnames(strong_tab) <- c("Trait", "Nuc", "Treatment", "stat", "stat_lower", "stat_upper", "p")
+# Table output: Weak MCH (F) stacked above Strong MCH (r) as two labelled sections.
+# "stat" is the reported effect measure (F ratio / r); "test_stat" is the actual
+# statistic the p-value is computed from -- identical to F_stat for the F-test rows
+# (the F ratio *is* the test statistic), but distinct from r for the correlation
+# rows (t, not r, is the test statistic there). df2 is NA for the correlation rows,
+# which only have a single df (n - 2).
+weak_tab <- corvar %>%
+  transmute(Trait, Nuc, Treatment,
+            stat = F_stat, test_stat = F_stat, df1, df2,
+            stat_lower = F_lower, stat_upper = F_upper, p = p_value)
+
+strong_tab <- corvar %>%
+  transmute(Trait, Nuc, Treatment,
+            stat = r, test_stat = t_stat, df1 = df, df2 = NA_real_,
+            stat_lower = r_lower, stat_upper = r_upper, p = p)
 
 mch_tab <- rbind(weak_tab, strong_tab)
 n_weak  <- nrow(weak_tab)
@@ -253,13 +277,18 @@ n_weak  <- nrow(weak_tab)
 save_source_data(mch_tab, "mothersCurse_mch_table", "supp_figs")
 
 mch_tab %>%
+  # df2 doesn't apply to the correlation (Strong MCH) rows (single-df t-test);
+  # blank it for print only -- mch_tab itself (source data) keeps real NA.
+  mutate(df2 = ifelse(is.na(df2), "", as.character(df2)),
+         p   = format_p(p)) %>%
   kable(
     format    = "latex",
     booktabs  = TRUE,
     linesep   = "",
     escape    = FALSE,
-    digits    = rep(4, 7),
-    col.names = c("Trait", "Nuc", "Treatment", "Statistic", "$CI_{lower}$", "$CI_{upper}$", "$p$")
+    digits    = c(0, 0, 0, 4, 4, 0, 0, 4, 4, 4),
+    col.names = c("Trait", "Nuc", "Treatment", "Statistic", "Test stat.",
+                  "$df_1$", "$df_2$", "$CI_{lower}$", "$CI_{upper}$", "$p$")
   ) %>%
   kable_styling(
     latex_options = c("hold_position"),

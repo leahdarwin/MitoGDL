@@ -100,9 +100,9 @@ combs_M <- lapply(combs_F, function(x) gsub("_F", "_M", x))
 # -------------------------------------------------------------------
 get_axisLab <- function(pheno) {
   case_when(
-    grepl("climb",  pheno) ~ "Climbing velocity (cm/s)",
-    grepl("flight", pheno) ~ "Mean landing height (m)",
-    grepl("dev",    pheno) ~ "Development time (days)",
+    grepl("climb",  pheno) ~ "Climb vel. (cm/s)",
+    grepl("flight", pheno) ~ "Landing ht. (m)",
+    grepl("dev",    pheno) ~ "Dev. time (days)",
     grepl("weight", pheno) ~ "Weight (mg)"
   )
 }
@@ -134,8 +134,9 @@ make_plot <- function(comb, data) {
 get_cor <- function(comb, nuc, data) {
   col1 <- data %>% filter(Nuc == nuc) %>% pull(comb[1])
   col2 <- data %>% filter(Nuc == nuc) %>% pull(comb[2])
-  test <- cor.test(col1, col2)
-  return(c(comb[1], comb[2], nuc, test$estimate, test$conf.int[1], test$conf.int[2], test$p.value))
+  test <- cor.test(col1, col2)  # Pearson by default: statistic = t, parameter = df (n-2)
+  return(c(comb[1], comb[2], nuc, test$estimate, test$statistic, test$parameter,
+           test$conf.int[1], test$conf.int[2], test$p.value))
 }
 
 # -------------------------------------------------------------------
@@ -148,11 +149,14 @@ run_corr_tests <- function(combs, merged_df) {
   )
 
   corr_tab <- as.data.frame(do.call(rbind, corr_results)) %>%
-    `colnames<-`(c("Phenotype 1", "Phenotype 2", "Nuc", "Correlation coeff", "CI lower", "CI upper", "p-value")) %>%
+    `colnames<-`(c("Phenotype 1", "Phenotype 2", "Nuc", "Correlation coeff",
+                   "t", "df", "CI lower", "CI upper", "p-value")) %>%
     mutate(
       `Phenotype 1` = get_axisLab(`Phenotype 1`),
       `Phenotype 2` = get_axisLab(`Phenotype 2`),
       `Correlation coeff` = as.numeric(`Correlation coeff`),
+      t                   = as.numeric(t),
+      df                  = as.numeric(df),
       `CI lower`          = as.numeric(`CI lower`),
       `CI upper`          = as.numeric(`CI upper`),
       `p-value`           = as.numeric(`p-value`)
@@ -165,8 +169,9 @@ run_corr_tests <- function(combs, merged_df) {
           booktabs  = TRUE,
           linesep   = "",
           escape    = FALSE,
-          digits    = rep(3, 7),
-          col.names = c("Phenotype 1", "Phenotype 2", "Nuc", "$r$", "$r_{lower}$", "$r_{upper}$", "$p$")) %>%
+          digits    = c(3, 3, 3, 3, 3, 0, 3, 3, 3),
+          col.names = c("Phenotype 1", "Phenotype 2", "Nuc", "$r$", "$t$", "$df$",
+                        "$r_{lower}$", "$r_{upper}$", "$p$")) %>%
       kable_styling(
         latex_options = c("hold_position"),
         full_width    = FALSE,

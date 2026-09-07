@@ -30,6 +30,15 @@ egg_count <- read.csv("data/survival.csv") %>% mutate(Total = F_total + M_total)
 # Helpers
 # -------------------------------------------------------------------------
 
+# Format p-values: fixed 4 decimal places for p >= 0.0001, switching to
+# 2-significant-figure scientific notation below that (rather than the
+# 0.0000 that fixed-decimal formatting would otherwise show).
+format_p <- function(p, threshold = 1e-4) {
+  ifelse(p < threshold,
+         formatC(signif(p, 2), format = "e", digits = 1),
+         formatC(p, format = "f", digits = 4))
+}
+
 # Tidy ANOVA table from lmerTest model with R² effect sizes
 tidy_aov <- function(model) {
   r2 <- r2beta(model) %>% select(Effect, Rsq)
@@ -38,7 +47,7 @@ tidy_aov <- function(model) {
     left_join(r2, by = join_by(term == Effect)) %>%
     mutate(
       across(c(sumsq, meansq, statistic, Rsq), ~round(., 4)),
-      p.value = format.pval(p.value, digits = 3, eps = 0.001)
+      p.value = format_p(p.value)
     )
 }
 

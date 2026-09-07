@@ -11,7 +11,7 @@
 ## ---------------------------------------------------------
 ## Load required packages (install if missing)
 ## ---------------------------------------------------------
-packages <- c("dplyr", "ggplot2", "agricolae", "ggrepel", "patchwork")
+packages <- c("dplyr", "ggplot2", "agricolae", "ggrepel", "patchwork", "knitr", "kableExtra")
 installed <- rownames(installed.packages())
 for (p in packages) {
   if (!(p %in% installed)) {
@@ -132,6 +132,53 @@ print(mF$analysis)
 
 mM <- with(climbM, AMMI(NucTreat, Mito, Build, climb, PC = TRUE))
 print(mM$analysis)
+
+## ---------------------------------------------------------
+## Format p-values: fixed 4 decimal places for p >= 0.0001, switching to
+## 2-significant-figure scientific notation below that (rather than the
+## 0.0000 that fixed-decimal formatting would otherwise show).
+## ---------------------------------------------------------
+format_p <- function(p, threshold = 1e-4) {
+  ifelse(p < threshold,
+         formatC(signif(p, 2), format = "e", digits = 1),
+         formatC(p, format = "f", digits = 4))
+}
+
+## ---------------------------------------------------------
+## Gollob's F-test for IPCA axis significance (Sum Sq, Mean Sq,
+## F, numerator/denominator df, p) -- printed to console as a
+## LaTeX kable for copy-paste, not saved as source data.
+## ---------------------------------------------------------
+ipca_tab <- function(model, sex) {
+  df2 <- model$ANOVA["Residuals", "Df"]  # denominator df, shared across axes
+  model$analysis %>%
+    mutate(
+      Sex  = sex,
+      IPCA = rownames(model$analysis),
+      df2  = df2
+    ) %>%
+    select(Sex, IPCA, Df, df2, Sum.Sq, Mean.Sq, F.value, Pr.F, percent, acum)
+}
+
+ipca_sig_tab <- rbind(ipca_tab(mF, "F"), ipca_tab(mM, "M"))
+
+print(
+  kable(ipca_sig_tab %>% mutate(Pr.F = format_p(Pr.F)),
+        format    = "latex",
+        booktabs  = TRUE,
+        linesep   = "",
+        escape    = FALSE,
+        digits    = c(0, 0, 0, 0, 3, 3, 2, 4, 1, 1),
+        row.names = FALSE,
+        col.names = c("Sex", "IPCA", "$df_1$", "$df_2$", "Sum Sq", "Mean Sq",
+                      "$F$", "$p$", "\\% Var", "Cum. \\%")) %>%
+    kable_styling(
+      latex_options = c("hold_position"),
+      full_width    = FALSE,
+      font_size     = 10
+    ) %>%
+    column_spec(1, width = "3em")
+)
 
 # Generate plots
 pF <- make_plot(climbF, "Female Climb")

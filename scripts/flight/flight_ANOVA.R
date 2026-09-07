@@ -63,10 +63,19 @@ r2_nakagawa(flight_lm)
 # Effect sizes
 r2_flight = r2beta(flight_lm)
 
+# Format p-values: fixed 4 decimal places for p >= 0.0001, switching to
+# 2-significant-figure scientific notation below that (rather than the
+# 0.0000 that fixed-decimal formatting would otherwise show).
+format_p <- function(p, threshold = 1e-4) {
+  ifelse(p < threshold,
+         formatC(signif(p, 2), format = "e", digits = 1),
+         formatC(p, format = "f", digits = 4))
+}
+
 # Helper: publication-ready kable for ANOVA tables
 fmt_kable <- function(tab) {
   tab <- tab %>%
-    mutate(p.value = format.pval(p.value, digits = 3, eps = 0.001))
+    mutate(p.value = format_p(p.value))
   kable(
     tab,
     format    = "latex",
