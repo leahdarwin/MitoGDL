@@ -1,5 +1,7 @@
 # MitoGDL 
-This repository contains all data and scripts used for the analyses and figures in the accompanying manuscript "Genetic and environmental interactions outweigh mitonuclear coevolution for complex traits in Drosophila". Data and scripts are organised into top-level `data/` and `scripts/` folders, with scripts subdivided by trait. A separate `figures/` folder holds the output figures.
+This repository contains all scripts used for the analyses and figures in the accompanying manuscript "Phenotypic variation in Drosophila complex traits is influenced more by genotype and environmental interactions than by mitonuclear coevolutionary history". 
+
+Scripts are organised into top-level `scripts/` folders, with scripts subdivided by trait. The `SCRIPTS.md` file describes the function of each script. A separate `figures/` folder holds the output figures. Data may be downloaded from a figshare data repository here: https://doi.org/10.6084/m9.figshare.32425263. 
 
 ---
 
@@ -26,6 +28,8 @@ This repository contains all data and scripts used for the analyses and figures 
 - **`data/`**  
   Contains all raw and processed data files in a single flat directory. This includes climbing, development, flight, survival, and weight data (raw set files, merged files, and adjusted files), as well as extra data for figures (phylogeny, CI chain SNPs, protein structure).  
   Complex I AA changes are given in `data/CI_chain_snps.tsv`.
+
+  **DATA DOWNLOAD HERE:** https://doi.org/10.6084/m9.figshare.32425263
 
 - **`scripts/`**  
   Contains all analysis and figure scripts, organised by trait. All scripts use paths relative to the project root (open `MitoGDL.Rproj` in RStudio to set the working directory automatically).
